@@ -14,6 +14,12 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Select Xcode 16.2
+        run: |
+          echo "DEVELOPER_DIR=/Applications/Xcode_16.2.app/Contents/Developer" >> "$GITHUB_ENV"
+          sudo xcode-select -s /Applications/Xcode_16.2.app/Contents/Developer
+          xcodebuild -version
+
       - name: Show Swift version
         run: swift --version
 
