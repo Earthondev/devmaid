@@ -34,5 +34,7 @@ Use the right channel so people can get help quickly and maintainers can keep th
 
 Project support and sponsorship links should point users to:
 
-- `https://github.com/your-org/devmaid/issues`
-- `security@your-domain.example`
+- `https://github.com/Earthondev/devmaid/issues`
+- `https://github.com/Earthondev/devmaid/discussions`
+- `https://github.com/sponsors/Earthondev`
+- `https://github.com/Earthondev/devmaid/security`

@@ -115,12 +115,12 @@ struct TrendSummaryPoint: Identifiable {
 }
 
 enum RoomServiceLinks {
-    static let website = URL(string: "https://github.com/your-org/devmaid")!
-    static let support = URL(string: "https://github.com/your-org/devmaid/issues")!
-    static let sponsor = URL(string: "https://github.com/sponsors/your-org")!
-    static let privacy = URL(string: "https://github.com/your-org/devmaid/blob/main/PRIVACY.md")!
-    static let repository = URL(string: "https://github.com/your-org/devmaid")!
-    static let securityEmail = URL(string: "mailto:security@your-domain.example")!
+    static let website = URL(string: "https://github.com/Earthondev/devmaid")!
+    static let support = URL(string: "https://github.com/Earthondev/devmaid/issues")!
+    static let sponsor = URL(string: "https://github.com/sponsors/Earthondev")!
+    static let privacy = URL(string: "https://github.com/Earthondev/devmaid/blob/main/PRIVACY.md")!
+    static let repository = URL(string: "https://github.com/Earthondev/devmaid")!
+    static let securityEmail = URL(string: "https://github.com/Earthondev/devmaid/security")!
 }
 
 enum AppPreferences {

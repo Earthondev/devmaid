@@ -6,12 +6,11 @@ DevMaid touches developer machines and file deletion workflows, so security and 
 
 Please do not open a public issue first for vulnerabilities that could expose user data, unsafe deletion behavior, privilege abuse, or path traversal problems.
 
-Instead, send a private report to the maintainer contact you publish for the repository.
+Instead, use the repository's private security reporting flow.
 
 Current security contact:
 
-- `security@your-domain.example`
-- `https://github.com/your-org/devmaid/security`
+- `https://github.com/Earthondev/devmaid/security`
 
 ## What to include
 

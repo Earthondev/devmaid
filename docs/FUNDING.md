@@ -6,7 +6,7 @@ If DevMaid is going to be distributed seriously, it helps to make support channe
 
 Recurring support:
 
-- primary landing page: `https://github.com/your-org/devmaid`
+- primary landing page: `https://github.com/Earthondev/devmaid`
 - GitHub Sponsors behind that landing page if enabled
 
 One-time support:
@@ -24,8 +24,8 @@ Professional support:
 
 Primary public funding/support URL:
 
-- `https://github.com/your-org/devmaid`
-- company contact: `support@your-domain.example`
+- `https://github.com/Earthondev/devmaid`
+- sponsor page: `https://github.com/sponsors/Earthondev`
 
 ## Suggested README wording
 

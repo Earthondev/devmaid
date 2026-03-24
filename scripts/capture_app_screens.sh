@@ -61,8 +61,8 @@ cat > "$UPDATE_FEED" <<'JSON'
   "build": "0.3.0",
   "minimumSystemVersion": "13.0",
   "summary": "A softer glassmorphism refresh, in-app update checks, and a cleaner macOS-native navigation shell.",
-  "downloadURL": "https://github.com/your-org/devmaid/releases/download/v0.3.0/DevMaid-0.3.0.dmg",
-  "releaseNotesURL": "https://github.com/your-org/devmaid/releases/tag/v0.3.0",
+  "downloadURL": "https://github.com/Earthondev/devmaid/releases/download/v0.3.0/DevMaid-0.3.0.dmg",
+  "releaseNotesURL": "https://github.com/Earthondev/devmaid/releases/tag/v0.3.0",
   "publishedAt": "2026-03-24T12:00:00Z"
 }
 JSON

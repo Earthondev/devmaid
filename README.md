@@ -36,13 +36,13 @@ DevMaid is being prepared as a serious public project:
 The CLI remains available through Homebrew:
 
 ```bash
-brew install --formula https://github.com/your-org/devmaid/releases/latest/download/devmaid.rb
+brew install --formula https://github.com/Earthondev/devmaid/releases/latest/download/devmaid.rb
 ```
 
 If you maintain a tap:
 
 ```bash
-brew tap your-org/devmaid
+brew tap Earthondev/devmaid
 brew install devmaid
 ```
 
@@ -77,15 +77,15 @@ The update feed is a JSON document shaped like:
   "build": "0.3.0",
   "minimumSystemVersion": "13.0",
   "summary": "Release summary",
-  "downloadURL": "https://github.com/your-org/devmaid/releases/download/v0.3.0/DevMaid-0.3.0.dmg",
-  "releaseNotesURL": "https://github.com/your-org/devmaid/releases/tag/v0.3.0",
+  "downloadURL": "https://github.com/Earthondev/devmaid/releases/download/v0.3.0/DevMaid-0.3.0.dmg",
+  "releaseNotesURL": "https://github.com/Earthondev/devmaid/releases/tag/v0.3.0",
   "publishedAt": "2026-03-24T12:00:00Z"
 }
 ```
 
 ## Community and support
 
-If you publish this project on GitHub, the recommended support channels are:
+The recommended support channels are:
 
 - bugs and regressions: GitHub Issues
 - usage questions: GitHub Discussions or [SUPPORT.md](/Users/earthondev/Desktop/RoomService/SUPPORT.md)
@@ -95,7 +95,7 @@ If you publish this project on GitHub, the recommended support channels are:
 
 ## Support the maintainer
 
-This repo now includes a funding plan in [FUNDING.md](/Users/earthondev/Desktop/RoomService/docs/FUNDING.md) so you can expose support channels when you publish it.
+This repo now includes a funding plan in [FUNDING.md](/Users/earthondev/Desktop/RoomService/docs/FUNDING.md) so support channels stay consistent across the app, the CLI, and GitHub.
 
 Recommended support options:
 

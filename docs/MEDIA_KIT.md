@@ -34,10 +34,10 @@ DevMaid is a native macOS cleanup tool built around the storage problems develop
 
 - [Wordmark SVG](/Users/earthondev/Desktop/RoomService/docs/assets/devmaid-wordmark.svg)
 
-## Support links to replace before launch
+## Support links
 
-- repository: `https://github.com/your-org/devmaid`
-- issues: `https://github.com/your-org/devmaid/issues`
-- discussions: `https://github.com/your-org/devmaid/discussions`
-- sponsors: `https://github.com/sponsors/your-org`
-- security: `security@your-domain.example`
+- repository: `https://github.com/Earthondev/devmaid`
+- issues: `https://github.com/Earthondev/devmaid/issues`
+- discussions: `https://github.com/Earthondev/devmaid/discussions`
+- sponsors: `https://github.com/sponsors/Earthondev`
+- security: `https://github.com/Earthondev/devmaid/security`

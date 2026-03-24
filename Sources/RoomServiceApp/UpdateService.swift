@@ -74,7 +74,7 @@ struct AppUpdateConfiguration: Sendable {
             return AppUpdateConfiguration(feedURL: url)
         }
 
-        return AppUpdateConfiguration(feedURL: URL(string: "https://github.com/your-org/devmaid/releases/latest/download/appcast.json"))
+        return AppUpdateConfiguration(feedURL: URL(string: "https://github.com/Earthondev/devmaid/releases/latest/download/appcast.json"))
     }
 
     private static func parseURL(_ rawValue: String) -> URL? {

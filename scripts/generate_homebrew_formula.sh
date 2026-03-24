@@ -18,7 +18,7 @@ EOF
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 OUTPUT_PATH="$ROOT_DIR/dist/devmaid.rb"
-HOMEPAGE="https://github.com/your-org/devmaid"
+HOMEPAGE="https://github.com/Earthondev/devmaid"
 LICENSE_NAME="MIT"
 VERSION=""
 GENERIC_URL=""

@@ -110,7 +110,7 @@ If you add these GitHub secrets, the release workflow will also sign and notariz
 
 1. Push a tag such as `v0.2.0`, or run the `Release` GitHub Actions workflow manually
 2. Verify the generated tarball, dmg, checksums, and `devmaid.rb`
-3. Publish that formula in your tap repo if you want `brew tap your-org/devmaid && brew install devmaid`
+3. Publish that formula in your tap repo if you want `brew tap Earthondev/devmaid && brew install devmaid`
 4. Verify both install paths on a clean machine:
    `brew install`
    direct dmg download + app launch
