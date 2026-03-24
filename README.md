@@ -68,6 +68,7 @@ DevMaid can check for updates directly inside the app:
 - `About` and `Settings` both surface the current version and latest known version
 - the app reads an update feed from `DevMaidUpdateFeedURL` in the app bundle
 - local development and screenshot runs can override that feed with `DEVMAID_UPDATE_FEED_URL` or `ROOMSERVICE_UPDATE_FEED_URL`
+- GitHub releases should publish `appcast.json` alongside the DMG so the in-app updater has a stable latest-release feed
 
 The update feed is a JSON document shaped like:
 

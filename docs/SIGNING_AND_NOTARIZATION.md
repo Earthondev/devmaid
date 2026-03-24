@@ -24,6 +24,7 @@ That produces:
 - `dist/devmaid-<version>-macos-<arch>.tar.gz`
 - `dist/DevMaid.app`
 - `dist/DevMaid-<version>.dmg`
+- `dist/appcast.json` when paired with the release publish flow
 - `dist/checksums-<version>.txt`
 
 ## Configure notarytool
@@ -68,6 +69,7 @@ The current release workflow will pass those through to `./scripts/build_release
 
 1. Build the signed release locally once and verify it opens on a clean Mac.
 2. Confirm the DMG, CLI tarball, and formula all reference the same version.
-3. Upload the notarized DMG and tarball to a GitHub release.
+3. Upload the notarized DMG, tarball, `devmaid.rb`, and `appcast.json` to a GitHub release.
 4. Verify `brew install --formula <public devmaid.rb url>` works from that release.
-5. Test direct DMG download and first launch on a machine that never ran DevMaid before.
+5. Verify the app can fetch the released `appcast.json` from inside `About` or `Settings`.
+6. Test direct DMG download and first launch on a machine that never ran DevMaid before.

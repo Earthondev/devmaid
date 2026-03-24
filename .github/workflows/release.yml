@@ -66,8 +66,26 @@ jobs:
             --version "$VERSION" \
             --url "$DOWNLOAD_URL" \
             --archive "$TARBALL_PATH" \
-            --homepage "https://github.com/your-org/devmaid" \
+            --homepage "https://github.com/${GITHUB_REPOSITORY}" \
             --output "dist/devmaid.rb"
+
+      - name: Generate appcast
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TAG_NAME="${{ steps.version.outputs.tag_name }}"
+          DMG_PATH="dist/DevMaid-${VERSION}.dmg"
+          if [[ ! -f "$DMG_PATH" ]]; then
+            echo "Expected DMG was not generated." >&2
+            exit 1
+          fi
+
+          ./scripts/generate_appcast.sh \
+            --version "$VERSION" \
+            --summary "Free preview-first cleanup for developer Macs with native app + CLI, safe quarantine-first deletion, and local update checks." \
+            --download-url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/$(basename "$DMG_PATH")" \
+            --release-notes-url "https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG_NAME}" \
+            --output "dist/appcast.json"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -78,6 +96,7 @@ jobs:
             dist/*.dmg
             dist/*.txt
             dist/*.rb
+            dist/*.json
             dist/DevMaid.app
           if-no-files-found: error
 
@@ -93,3 +112,4 @@ jobs:
             dist/*.dmg
             dist/*.txt
             dist/*.rb
+            dist/*.json
