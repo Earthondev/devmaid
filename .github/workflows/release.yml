@@ -1,0 +1,95 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release version without the leading v
+        required: true
+      publish_release:
+        description: Create or update the GitHub release
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    runs-on: macos-14
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+            TAG_NAME="${GITHUB_REF_NAME}"
+            SHOULD_PUBLISH="true"
+          else
+            VERSION="${{ inputs.version }}"
+            TAG_NAME="v${VERSION}"
+            SHOULD_PUBLISH="${{ inputs.publish_release }}"
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag_name=${TAG_NAME}" >> "$GITHUB_OUTPUT"
+          echo "should_publish=${SHOULD_PUBLISH}" >> "$GITHUB_OUTPUT"
+
+      - name: Build release artifacts
+        env:
+          DEVMAID_SIGNING_IDENTITY: ${{ secrets.DEVMAID_SIGNING_IDENTITY }}
+          DEVMAID_NOTARY_KEYCHAIN_PROFILE: ${{ secrets.DEVMAID_NOTARY_KEYCHAIN_PROFILE }}
+        run: ./scripts/build_release.sh "${{ steps.version.outputs.version }}"
+
+      - name: Generate Homebrew formula
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          TARBALL_PATH="$(find dist -maxdepth 1 -name "devmaid-${VERSION}-macos-*.tar.gz" | head -n 1)"
+          if [[ -z "$TARBALL_PATH" ]]; then
+            echo "Expected Homebrew tarball was not generated." >&2
+            exit 1
+          fi
+
+          TARBALL_NAME="$(basename "$TARBALL_PATH")"
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ steps.version.outputs.tag_name }}/${TARBALL_NAME}"
+
+          ./scripts/generate_homebrew_formula.sh \
+            --version "$VERSION" \
+            --url "$DOWNLOAD_URL" \
+            --archive "$TARBALL_PATH" \
+            --homepage "https://github.com/your-org/devmaid" \
+            --output "dist/devmaid.rb"
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: devmaid-${{ steps.version.outputs.version }}-artifacts
+          path: |
+            dist/*.tar.gz
+            dist/*.dmg
+            dist/*.txt
+            dist/*.rb
+            dist/DevMaid.app
+          if-no-files-found: error
+
+      - name: Publish GitHub release
+        if: steps.version.outputs.should_publish == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag_name }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true
+          files: |
+            dist/*.tar.gz
+            dist/*.dmg
+            dist/*.txt
+            dist/*.rb

@@ -1,0 +1,16 @@
+<svg width="920" height="220" viewBox="0 0 920 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="devmaidGradient" x1="24" y1="20" x2="196" y2="196" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1587B8"/>
+      <stop offset="1" stop-color="#31BEAE"/>
+    </linearGradient>
+  </defs>
+  <rect x="24" y="20" width="172" height="172" rx="44" fill="url(#devmaidGradient)"/>
+  <rect x="42" y="38" width="136" height="136" rx="34" fill="white" fill-opacity="0.16"/>
+  <rect x="72" y="120" width="76" height="16" rx="8" fill="white" fill-opacity="0.94"/>
+  <rect x="60" y="96" width="100" height="22" rx="11" fill="white" fill-opacity="0.94"/>
+  <rect x="48" y="62" width="124" height="28" rx="14" fill="white" fill-opacity="0.9"/>
+  <text x="680" y="88" text-anchor="end" font-size="102" font-family="SF Pro Display, Inter, sans-serif" font-weight="700" fill="#192434">DevMaid</text>
+  <text x="680" y="136" text-anchor="end" font-size="28" font-family="SF Pro Text, Inter, sans-serif" font-weight="600" fill="#5F717B">Storage cleanup for developers</text>
+  <text x="164" y="72" font-size="28" font-family="SF Pro Display, Inter, sans-serif" font-weight="700" fill="white">✦</text>
+</svg>

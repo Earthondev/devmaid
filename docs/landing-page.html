@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DevMaid</title>
+    <style>
+      :root {
+        --bg: #edf4f6;
+        --bg-accent: #d8ecef;
+        --ink: #1b2733;
+        --muted: #5d6a77;
+        --line: rgba(255, 255, 255, 0.65);
+        --card: rgba(255, 255, 255, 0.6);
+        --card-strong: rgba(255, 255, 255, 0.78);
+        --shadow: 0 24px 70px rgba(35, 72, 87, 0.12);
+        --blue: #2d88a8;
+        --teal: #3e9a90;
+        --amber: #d08a3b;
+        --red: #d46166;
+        --radius-xl: 28px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        font-family: "SF Pro Display", "SF Pro Text", ui-sans-serif, -apple-system, BlinkMacSystemFont, sans-serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(73, 173, 190, 0.24), transparent 28%),
+          radial-gradient(circle at top right, rgba(87, 167, 214, 0.18), transparent 24%),
+          linear-gradient(180deg, #f6fbfc 0%, var(--bg) 38%, #ebf1f5 100%);
+      }
+
+      a { color: inherit; text-decoration: none; }
+
+      .shell {
+        width: min(1180px, calc(100% - 40px));
+        margin: 0 auto;
+        padding: 28px 0 72px;
+      }
+
+      .glass {
+        background: var(--card);
+        backdrop-filter: blur(24px) saturate(140%);
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 18px;
+        border-radius: 999px;
+        margin-bottom: 28px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .brand img {
+        width: 34px;
+        height: 34px;
+        border-radius: 10px;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 10px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .nav-links a {
+        padding: 10px 14px;
+        border-radius: 999px;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 22px;
+        align-items: stretch;
+      }
+
+      .hero-copy,
+      .hero-shot,
+      .section-card,
+      .feature,
+      .gallery img,
+      .cta {
+        border-radius: var(--radius-xl);
+      }
+
+      .hero-copy {
+        padding: 34px;
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(45, 136, 168, 0.11);
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+      }
+
+      h1 {
+        margin: 18px 0 14px;
+        font-size: clamp(42px, 6vw, 72px);
+        line-height: 0.96;
+        letter-spacing: -0.05em;
+      }
+
+      .lead {
+        max-width: 620px;
+        font-size: 18px;
+        line-height: 1.65;
+        color: var(--muted);
+      }
+
+      .cta-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin: 24px 0 24px;
+      }
+
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 50px;
+        padding: 0 18px;
+        border-radius: 999px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .button-primary {
+        background: linear-gradient(135deg, var(--blue), #4a9fbb);
+        color: white;
+        box-shadow: 0 16px 36px rgba(45, 136, 168, 0.22);
+      }
+
+      .button-secondary {
+        background: rgba(255, 255, 255, 0.65);
+        border: 1px solid rgba(37, 70, 90, 0.08);
+        color: var(--ink);
+      }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .metric {
+        padding: 16px;
+        border-radius: var(--radius-md);
+        background: var(--card-strong);
+        border: 1px solid rgba(255, 255, 255, 0.7);
+      }
+
+      .metric small {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 8px;
+      }
+
+      .metric strong {
+        font-size: 22px;
+        letter-spacing: -0.03em;
+      }
+
+      .hero-shot {
+        padding: 18px;
+        display: flex;
+        align-items: center;
+      }
+
+      .hero-shot img,
+      .gallery img {
+        width: 100%;
+        display: block;
+        border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.76);
+        box-shadow: 0 18px 40px rgba(47, 73, 86, 0.16);
+      }
+
+      .section {
+        margin-top: 26px;
+      }
+
+      .section-card {
+        padding: 28px;
+      }
+
+      .section-heading {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        align-items: end;
+        margin-bottom: 18px;
+      }
+
+      .section-heading h2 {
+        margin: 0;
+        font-size: 30px;
+        letter-spacing: -0.04em;
+      }
+
+      .section-heading p,
+      .feature p,
+      .muted {
+        color: var(--muted);
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .feature {
+        padding: 22px;
+        background: rgba(255,255,255,0.58);
+        border: 1px solid rgba(255,255,255,0.68);
+      }
+
+      .feature-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 11px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 12px;
+      }
+
+      .safe { background: rgba(62, 154, 144, 0.12); color: var(--teal); }
+      .review { background: rgba(208, 138, 59, 0.12); color: var(--amber); }
+      .danger { background: rgba(212, 97, 102, 0.12); color: var(--red); }
+
+      .gallery {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .code-block {
+        margin-top: 14px;
+        padding: 18px;
+        border-radius: var(--radius-lg);
+        background: rgba(21, 33, 44, 0.92);
+        color: #dfe8ef;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 14px;
+        overflow: auto;
+      }
+
+      .cta {
+        padding: 28px;
+        margin-top: 28px;
+        background:
+          linear-gradient(135deg, rgba(45,136,168,0.94), rgba(62,154,144,0.84)),
+          rgba(255,255,255,0.2);
+        color: white;
+      }
+
+      .cta h2, .cta p { margin-top: 0; }
+      .cta p { color: rgba(255,255,255,0.82); }
+
+      .footer {
+        margin-top: 20px;
+        padding: 8px 6px 0;
+        font-size: 13px;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      @media (max-width: 980px) {
+        .hero,
+        .features,
+        .gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .metrics {
+          grid-template-columns: 1fr;
+        }
+
+        .section-heading {
+          flex-direction: column;
+          align-items: start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <div class="nav glass">
+        <div class="brand">
+          <img src="./assets/devmaid-wordmark.svg" alt="DevMaid" />
+          <span>DevMaid</span>
+        </div>
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#screens">Screens</a>
+          <a href="#install">Install</a>
+          <a href="https://github.com/your-org/devmaid">GitHub</a>
+        </div>
+      </div>
+
+      <section class="hero">
+        <div class="hero-copy glass">
+          <div class="eyebrow">Free macOS utility for developers</div>
+          <h1>Storage cleanup for developer Macs, without the guesswork.</h1>
+          <p class="lead">
+            DevMaid scans Xcode junk, Docker data, <code>node_modules</code>, <code>.venv</code>, editor caches,
+            package caches, and build artifacts with a preview-first workflow that shows exactly what you are about to clean.
+          </p>
+          <div class="cta-row">
+            <a class="button button-primary" href="https://github.com/your-org/devmaid/releases">Download DevMaid</a>
+            <a class="button button-secondary" href="https://github.com/your-org/devmaid">View on GitHub</a>
+          </div>
+          <div class="metrics">
+            <div class="metric">
+              <small>Cleanup model</small>
+              <strong>Preview first</strong>
+            </div>
+            <div class="metric">
+              <small>Safety model</small>
+              <strong>Quarantine first</strong>
+            </div>
+            <div class="metric">
+              <small>Interfaces</small>
+              <strong>App + CLI</strong>
+            </div>
+          </div>
+        </div>
+        <div class="hero-shot glass">
+          <img src="./assets/devmaid-window.png" alt="DevMaid Overview" />
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-card glass" id="features">
+          <div class="section-heading">
+            <div>
+              <h2>Built around real developer storage problems</h2>
+              <p class="muted">Not generic clutter. Not blind one-click cleanup.</p>
+            </div>
+          </div>
+          <div class="features">
+            <div class="feature">
+              <div class="feature-badge safe">See before you clean</div>
+              <h3>Every item stays visible</h3>
+              <p>Review category, path, size, and risk before you move anything.</p>
+            </div>
+            <div class="feature">
+              <div class="feature-badge review">Developer-first coverage</div>
+              <h3>Xcode, Docker, editors, artifacts</h3>
+              <p>Target the categories that actually fill up developer Macs.</p>
+            </div>
+            <div class="feature">
+              <div class="feature-badge danger">Safer destructive flow</div>
+              <h3>Quarantine and undo included</h3>
+              <p>DevMaid does not jump straight to hard delete in the main workflow.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-card glass" id="screens">
+          <div class="section-heading">
+            <div>
+              <h2>Native macOS screens</h2>
+              <p class="muted">Light-first, glassy, and tuned for review-heavy cleanup work.</p>
+            </div>
+          </div>
+          <div class="gallery">
+            <img src="./assets/devmaid-results.png" alt="DevMaid Results" />
+            <img src="./assets/devmaid-history.png" alt="DevMaid History" />
+            <img src="./assets/devmaid-settings.png" alt="DevMaid Settings" />
+            <img src="./assets/devmaid-about.png" alt="DevMaid About" />
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-card glass" id="install">
+          <div class="section-heading">
+            <div>
+              <h2>Install the way you work</h2>
+              <p class="muted">Desktop app for review. CLI for automation.</p>
+            </div>
+          </div>
+          <div class="features">
+            <div class="feature">
+              <h3>Desktop app</h3>
+              <p>Download the DMG, drag <code>DevMaid.app</code> into Applications, and complete the welcome guide.</p>
+            </div>
+            <div class="feature">
+              <h3>Homebrew formula</h3>
+              <p>Install the CLI from your generated release formula and wire it into maintenance scripts.</p>
+              <div class="code-block">brew install --formula https://github.com/your-org/devmaid/releases/latest/download/devmaid.rb</div>
+            </div>
+            <div class="feature">
+              <h3>Safety defaults</h3>
+              <p>Scans are read-only. Cleanup goes through quarantine first. Restore is available from History.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta glass">
+        <h2>Free cleanup for developer Macs, built to be trusted.</h2>
+        <p>
+          DevMaid keeps the important part of cleanup visible: what was found, how risky it is, and how to undo it if needed.
+        </p>
+        <div class="cta-row">
+          <a class="button button-secondary" href="https://github.com/your-org/devmaid/releases">Download the latest release</a>
+          <a class="button button-secondary" href="https://github.com/your-org/devmaid/discussions">Ask a question</a>
+        </div>
+      </section>
+
+      <div class="footer">
+        Storage cleanup for developers, without the guesswork.
+      </div>
+    </div>
+  </body>
+</html>

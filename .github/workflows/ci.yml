@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Show Swift version
+        run: swift --version
+
+      - name: Build CLI
+        run: swift build --product devmaid
+
+      - name: Build desktop app
+        run: swift build --product DevMaidApp
+
+      - name: Run smoke test
+        run: ./scripts/smoke_test.sh

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Support guide
+    url: https://github.com/your-org/devmaid/discussions
+    about: Start here for usage help and support questions.
+  - name: Security policy
+    url: https://github.com/your-org/devmaid/security
+    about: Please report security issues privately.
