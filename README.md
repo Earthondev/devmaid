@@ -47,21 +47,22 @@ Homebrew is available for both the CLI and the desktop app.
 CLI:
 
 ```bash
-brew install --formula https://github.com/Earthondev/devmaid/releases/latest/download/devmaid.rb
+brew tap Earthondev/devmaid
+brew install devmaid
 ```
 
 Desktop app:
 
 ```bash
-brew install --cask https://github.com/Earthondev/devmaid/releases/latest/download/devmaid-app.rb
+brew tap Earthondev/devmaid
+brew install --cask devmaid-app
 ```
 
-If you maintain a tap, the intended split is:
+Direct release-file installs still work too:
 
 ```bash
-brew tap Earthondev/devmaid
-brew install devmaid
-brew install --cask Earthondev/devmaid/devmaid-app
+brew install --formula https://github.com/Earthondev/devmaid/releases/latest/download/devmaid.rb
+brew install --cask https://github.com/Earthondev/devmaid/releases/latest/download/devmaid-app.rb
 ```
 
 ### App and CLI
@@ -70,6 +71,7 @@ brew install --cask Earthondev/devmaid/devmaid-app
 - `devmaid` is the CLI for automation and shell workflows
 - both products use `RoomServiceKit` as the cleanup engine
 - GitHub Releases is the main public download page for the free app
+- the Homebrew tap lives at [Earthondev/homebrew-devmaid](https://github.com/Earthondev/homebrew-devmaid)
 
 ## Updates
 

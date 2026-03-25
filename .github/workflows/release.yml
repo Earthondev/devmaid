@@ -156,3 +156,15 @@ jobs:
               --generate-notes \
               --latest
           fi
+
+      - name: Sync Homebrew tap
+        if: steps.version.outputs.should_publish == 'true' && secrets.DEVMAID_TAP_GH_TOKEN != ''
+        shell: bash
+        env:
+          DEVMAID_TAP_GH_TOKEN: ${{ secrets.DEVMAID_TAP_GH_TOKEN }}
+        run: |
+          ./scripts/sync_homebrew_tap.sh \
+            --version "${{ steps.version.outputs.version }}" \
+            --repository "${GITHUB_REPOSITORY}" \
+            --token "${DEVMAID_TAP_GH_TOKEN}" \
+            --tap-repository "Earthondev/homebrew-devmaid"
