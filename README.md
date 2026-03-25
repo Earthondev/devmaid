@@ -31,35 +31,45 @@ DevMaid is being prepared as a serious public project:
 
 ## Install
 
+### Direct download
+
+The easiest path for most people is the DMG from GitHub Releases:
+
+1. Open [GitHub Releases](https://github.com/Earthondev/devmaid/releases)
+2. Download `DevMaid-<version>.dmg`
+3. Drag `DevMaid.app` into Applications
+4. Launch the app and run your first scan
+
 ### Homebrew
 
-The CLI remains available through Homebrew:
+Homebrew is available for both the CLI and the desktop app.
+
+CLI:
 
 ```bash
 brew install --formula https://github.com/Earthondev/devmaid/releases/latest/download/devmaid.rb
 ```
 
-If you maintain a tap:
+Desktop app:
+
+```bash
+brew install --cask https://github.com/Earthondev/devmaid/releases/latest/download/devmaid-app.rb
+```
+
+If you maintain a tap, the intended split is:
 
 ```bash
 brew tap Earthondev/devmaid
 brew install devmaid
+brew install --cask Earthondev/devmaid/devmaid-app
 ```
-
-### DMG
-
-The desktop app is the main end-user product:
-
-1. Download `DevMaid-<version>.dmg`
-2. Open the DMG
-3. Drag `DevMaid.app` into Applications
-4. Launch the app and run your first scan
 
 ### App and CLI
 
 - `DevMaid.app` is the native macOS interface
 - `devmaid` is the CLI for automation and shell workflows
 - both products use `RoomServiceKit` as the cleanup engine
+- GitHub Releases is the main public download page for the free app
 
 ## Updates
 

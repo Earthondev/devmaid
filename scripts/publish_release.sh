@@ -42,6 +42,7 @@ TARBALL_PATH="$(find dist -maxdepth 1 -name "devmaid-${VERSION}-macos-*.tar.gz" 
 DMG_PATH="dist/DevMaid-${VERSION}.dmg"
 CHECKSUMS_PATH="dist/checksums-${VERSION}.txt"
 FORMULA_PATH="dist/devmaid.rb"
+CASK_PATH="dist/devmaid-app.rb"
 APPCAST_PATH="dist/appcast.json"
 
 if [[ ! -f "$TARBALL_PATH" || ! -f "$DMG_PATH" || ! -f "$CHECKSUMS_PATH" ]]; then
@@ -59,6 +60,13 @@ DMG_NAME="$(basename "$DMG_PATH")"
   --homepage "https://github.com/${REPOSITORY}" \
   --output "$FORMULA_PATH"
 
+./scripts/generate_homebrew_cask.sh \
+  --version "$VERSION" \
+  --url "https://github.com/${REPOSITORY}/releases/download/${TAG_NAME}/${DMG_NAME}" \
+  --dmg "$DMG_PATH" \
+  --homepage "https://github.com/${REPOSITORY}" \
+  --output "$CASK_PATH"
+
 ./scripts/generate_appcast.sh \
   --version "$VERSION" \
   --summary "$RELEASE_SUMMARY" \
@@ -72,6 +80,7 @@ if gh release view "$TAG_NAME" --repo "$REPOSITORY" >/dev/null 2>&1; then
     "$TARBALL_PATH" \
     "$CHECKSUMS_PATH" \
     "$FORMULA_PATH" \
+    "$CASK_PATH" \
     "$APPCAST_PATH" \
     --clobber \
     --repo "$REPOSITORY"
@@ -81,6 +90,7 @@ else
     "$TARBALL_PATH" \
     "$CHECKSUMS_PATH" \
     "$FORMULA_PATH" \
+    "$CASK_PATH" \
     "$APPCAST_PATH" \
     --repo "$REPOSITORY" \
     --title "DevMaid ${TAG_NAME}" \

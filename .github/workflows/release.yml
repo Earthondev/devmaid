@@ -79,6 +79,23 @@ jobs:
             --homepage "https://github.com/${GITHUB_REPOSITORY}" \
             --output "dist/devmaid.rb"
 
+      - name: Generate Homebrew cask
+        shell: bash
+        run: |
+          VERSION="${{ steps.version.outputs.version }}"
+          DMG_PATH="dist/DevMaid-${VERSION}.dmg"
+          if [[ ! -f "$DMG_PATH" ]]; then
+            echo "Expected DMG was not generated." >&2
+            exit 1
+          fi
+
+          ./scripts/generate_homebrew_cask.sh \
+            --version "$VERSION" \
+            --url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${{ steps.version.outputs.tag_name }}/$(basename "$DMG_PATH")" \
+            --dmg "$DMG_PATH" \
+            --homepage "https://github.com/${GITHUB_REPOSITORY}" \
+            --output "dist/devmaid-app.rb"
+
       - name: Generate appcast
         shell: bash
         run: |

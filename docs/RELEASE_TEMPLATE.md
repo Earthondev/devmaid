@@ -24,6 +24,7 @@ DevMaid is a free, preview-first cleanup tool for developer Macs. It helps recla
 - `DevMaid-<version>.dmg`
 - `devmaid-<version>-macos-<arch>.tar.gz`
 - `devmaid.rb`
+- `devmaid-app.rb`
 - `appcast.json`
 - `checksums-<version>.txt`
 

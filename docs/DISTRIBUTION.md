@@ -99,8 +99,9 @@ The release workflow:
 1. resolves the version from a tag like `v0.2.0` or a manual dispatch input
 2. runs `./scripts/build_release.sh`
 3. generates `dist/devmaid.rb` pointing at the GitHub release tarball
-4. generates `dist/appcast.json` for in-app update checks
-5. uploads the DMG, tarball, checksums, formula, and appcast as release assets
+4. generates `dist/devmaid-app.rb` pointing at the GitHub release DMG
+5. generates `dist/appcast.json` for in-app update checks
+6. uploads the DMG, tarball, checksums, formula, cask, and appcast as release assets
 
 If you add these GitHub secrets, the release workflow will also sign and notarize the DMG:
 
@@ -110,8 +111,9 @@ If you add these GitHub secrets, the release workflow will also sign and notariz
 ## Recommended release flow
 
 1. Push a tag such as `v0.2.0`, or run the `Release` GitHub Actions workflow manually
-2. Verify the generated tarball, dmg, checksums, `devmaid.rb`, and `appcast.json`
-3. Publish that formula in your tap repo if you want `brew tap Earthondev/devmaid && brew install devmaid`
+2. Verify the generated tarball, dmg, checksums, `devmaid.rb`, `devmaid-app.rb`, and `appcast.json`
+3. Publish the formula and cask in your tap repo if you want `brew tap Earthondev/devmaid && brew install devmaid` plus `brew install --cask Earthondev/devmaid/devmaid-app`
 4. Verify both install paths on a clean machine:
    `brew install`
+   `brew install --cask`
    direct dmg download + app launch
