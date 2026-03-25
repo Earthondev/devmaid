@@ -158,11 +158,16 @@ jobs:
           fi
 
       - name: Sync Homebrew tap
-        if: steps.version.outputs.should_publish == 'true' && secrets.DEVMAID_TAP_GH_TOKEN != ''
+        if: steps.version.outputs.should_publish == 'true'
         shell: bash
         env:
           DEVMAID_TAP_GH_TOKEN: ${{ secrets.DEVMAID_TAP_GH_TOKEN }}
         run: |
+          if [[ -z "${DEVMAID_TAP_GH_TOKEN}" ]]; then
+            echo "DEVMAID_TAP_GH_TOKEN is not configured. Skipping tap sync."
+            exit 0
+          fi
+
           ./scripts/sync_homebrew_tap.sh \
             --version "${{ steps.version.outputs.version }}" \
             --repository "${GITHUB_REPOSITORY}" \
