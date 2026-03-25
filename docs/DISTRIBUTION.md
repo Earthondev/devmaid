@@ -11,7 +11,7 @@ DevMaid can now be shipped in two installer-friendly forms:
 Run the release builder:
 
 ```bash
-cd /Users/earthondev/Desktop/RoomService
+cd /Users/earthondev/Desktop/Devmaid
 ./scripts/build_release.sh
 ```
 
@@ -26,7 +26,7 @@ The tarball is for Homebrew. The `.app` and `.dmg` are for website/download user
 
 ## Release version
 
-The default version comes from [VERSION](/Users/earthondev/Desktop/RoomService/VERSION).
+The default version comes from [VERSION](/Users/earthondev/Desktop/Devmaid/VERSION).
 
 Override it per release if needed:
 

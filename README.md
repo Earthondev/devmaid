@@ -133,7 +133,7 @@ DevMaid is meant to be transparent, automatable, and respectful of risk.
 ## Safety model
 
 - Preview first: `scan` never deletes anything
-- Quarantine first: `delete` moves items into `~/.roomservice/quarantine`
+- Quarantine first: `delete` moves items into `~/.devmaid/quarantine`
 - Undo support: `undo` restores an earlier action
 - Risk labels: each category is marked as `safe`, `review`, or `danger`
 - Dangerous targets: `docker-data` requires `--allow-danger`
@@ -241,7 +241,7 @@ The desktop app now includes a first-launch onboarding flow that links straight 
 
 ## State location
 
-DevMaid stores quarantine data and action history in `~/.roomservice` by default.
+DevMaid stores quarantine data and action history in `~/.devmaid` by default.
 
 For testing, CI, or isolated runs, set:
 

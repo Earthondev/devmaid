@@ -2,7 +2,7 @@
 
 ## Our standard
 
-RoomService is a project for people who want practical help, clear communication, and respectful collaboration.
+DevMaid is a project for people who want practical help, clear communication, and respectful collaboration.
 
 Examples of behavior that contribute to a positive environment:
 
@@ -26,4 +26,4 @@ Project maintainers may remove comments, issues, or contributions that violate t
 
 For conduct concerns, contact the project maintainer privately using the contact method you publish with the repository.
 
-For security-specific concerns, use [SECURITY.md](/Users/earthondev/Desktop/RoomService/SECURITY.md).
+For security-specific concerns, use [SECURITY.md](/Users/earthondev/Desktop/Devmaid/SECURITY.md).

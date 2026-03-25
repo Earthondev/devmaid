@@ -13,13 +13,13 @@ Use the right channel so people can get help quickly and maintainers can keep th
 - Usage questions:
   Prefer GitHub Discussions if enabled. If not, open an Issue and label it as a question.
 - Security issues:
-  Do not post publicly first. Follow [SECURITY.md](/Users/earthondev/Desktop/RoomService/SECURITY.md).
+  Do not post publicly first. Follow [SECURITY.md](/Users/earthondev/Desktop/Devmaid/SECURITY.md).
 
 ## Before opening an issue
 
 - Run `devmaid help`
-- Check [README.md](/Users/earthondev/Desktop/RoomService/README.md)
-- Check [DISTRIBUTION.md](/Users/earthondev/Desktop/RoomService/docs/DISTRIBUTION.md) if the problem is about packaging or installation
+- Check [README.md](/Users/earthondev/Desktop/Devmaid/README.md)
+- Check [DISTRIBUTION.md](/Users/earthondev/Desktop/Devmaid/docs/DISTRIBUTION.md) if the problem is about packaging or installation
 - Include whether Terminal has Full Disk Access if the issue involves missing scan results
 
 ## What helps maintainers most

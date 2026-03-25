@@ -5,7 +5,7 @@ Before publishing DevMaid for real users, finish these items:
 ## Repository
 
 - replace GitHub placeholders with your live repo/support/security URLs
-- confirm the maintainer contact in [SECURITY.md](/Users/earthondev/Desktop/RoomService/SECURITY.md)
+- confirm the maintainer contact in [SECURITY.md](/Users/earthondev/Desktop/Devmaid/SECURITY.md)
 - update `.github/FUNDING.yml` if the support URL changes
 - enable GitHub Discussions if you want a support forum
 

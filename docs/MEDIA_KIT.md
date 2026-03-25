@@ -24,15 +24,15 @@ DevMaid is a native macOS cleanup tool built around the storage problems develop
 
 ## Suggested screenshots
 
-- [Overview](/Users/earthondev/Desktop/RoomService/docs/assets/devmaid-window.png)
-- [Results](/Users/earthondev/Desktop/RoomService/docs/assets/devmaid-results.png)
-- [History](/Users/earthondev/Desktop/RoomService/docs/assets/devmaid-history.png)
-- [Settings](/Users/earthondev/Desktop/RoomService/docs/assets/devmaid-settings.png)
-- [About](/Users/earthondev/Desktop/RoomService/docs/assets/devmaid-about.png)
+- [Overview](/Users/earthondev/Desktop/Devmaid/docs/assets/devmaid-window.png)
+- [Results](/Users/earthondev/Desktop/Devmaid/docs/assets/devmaid-results.png)
+- [History](/Users/earthondev/Desktop/Devmaid/docs/assets/devmaid-history.png)
+- [Settings](/Users/earthondev/Desktop/Devmaid/docs/assets/devmaid-settings.png)
+- [About](/Users/earthondev/Desktop/Devmaid/docs/assets/devmaid-about.png)
 
 ## Brand assets
 
-- [Wordmark SVG](/Users/earthondev/Desktop/RoomService/docs/assets/devmaid-wordmark.svg)
+- [Wordmark SVG](/Users/earthondev/Desktop/Devmaid/docs/assets/devmaid-wordmark.svg)
 
 ## Support links
 

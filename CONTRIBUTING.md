@@ -5,7 +5,7 @@ Thanks for helping improve DevMaid.
 ## Development workflow
 
 ```bash
-cd /Users/earthondev/Desktop/RoomService
+cd /Users/earthondev/Desktop/Devmaid
 swift build
 ./scripts/smoke_test.sh
 ```
@@ -15,7 +15,7 @@ swift build
 - new cleanup categories for developer tools
 - safer detection rules and risk labeling
 - packaging and release automation
-- SwiftUI GUI work built on top of `RoomServiceKit`
+- SwiftUI GUI work built on top of `DevMaidKit`
 - docs improvements, especially install and recovery guidance
 
 ## Contribution expectations

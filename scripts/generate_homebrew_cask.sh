@@ -101,7 +101,7 @@ cask "$TOKEN" do
   app "DevMaid.app"
 
   zap trash: [
-    "~/.roomservice",
+    "~/.devmaid",
     "~/Library/Application Support/DevMaid",
     "~/Library/Preferences/app.devmaid.desktop.plist",
   ]
