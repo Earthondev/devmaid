@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 TMP_DIR="$(mktemp -d)"
-export ROOMSERVICE_HOME="$TMP_DIR/.roomservice-home"
+export DEVMAID_HOME="$TMP_DIR/.devmaid-home"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 mkdir -p "$TMP_DIR/DemoApp/node_modules"

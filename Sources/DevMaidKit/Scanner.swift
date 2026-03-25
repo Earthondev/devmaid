@@ -1,6 +1,6 @@
 import Foundation
 
-public final class RoomServiceScanner {
+public final class DevMaidScanner {
     private let fileManager: FileManager
     private let sizer: DirectorySizer
 
@@ -16,10 +16,10 @@ public final class RoomServiceScanner {
         var seenPaths = Set<String>()
 
         let categories = configuration.categories.isEmpty ? CleanupCategory.allCases : configuration.categories
-        let roots = configuration.searchRoots.map { RoomServicePaths.expandedHomePath($0, fileManager: fileManager) }
+        let roots = configuration.searchRoots.map { DevMaidPaths.expandedHomePath($0, fileManager: fileManager) }
         let excludedPaths = Set(
             configuration.excludedPaths
-                .map { RoomServicePaths.expandedHomePath($0, fileManager: fileManager) }
+                .map { DevMaidPaths.expandedHomePath($0, fileManager: fileManager) }
                 .map { URL(fileURLWithPath: $0).standardizedFileURL.path }
         )
 

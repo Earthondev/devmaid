@@ -1,10 +1,10 @@
 import AppKit
 import Foundation
-import RoomServiceKit
+import DevMaidKit
 import SwiftUI
 import UserNotifications
 
-enum RoomServiceDestination: String, CaseIterable, Hashable, Identifiable {
+enum DevMaidDestination: String, CaseIterable, Hashable, Identifiable {
     case overview
     case results
     case history
@@ -114,7 +114,15 @@ struct TrendSummaryPoint: Identifiable {
     let usedBytes: Int64
 }
 
-enum RoomServiceLinks {
+struct ResultGroupSummary: Identifiable {
+    let id: String
+    let title: String
+    let itemCount: Int
+    let totalBytes: Int64
+    let highestRisk: RiskLevel
+}
+
+enum DevMaidLinks {
     static let website = URL(string: "https://github.com/Earthondev/devmaid")!
     static let support = URL(string: "https://github.com/Earthondev/devmaid/issues")!
     static let sponsor = URL(string: "https://github.com/sponsors/Earthondev")!
@@ -124,13 +132,13 @@ enum RoomServiceLinks {
 }
 
 enum AppPreferences {
-    static let searchRootsKey = "roomservice.searchRoots"
-    static let requireConfirmationKey = "roomservice.requireConfirmation"
-    static let requireDangerConfirmationKey = "roomservice.requireDangerConfirmation"
-    static let includedCategoriesKey = "roomservice.includedCategories"
-    static let languageKey = "roomservice.language"
-    static let autoCheckUpdatesKey = "roomservice.autoCheckUpdates"
-    static let lastUpdateCheckKey = "roomservice.lastUpdateCheck"
+    static let searchRootsKey = "devmaid.searchRoots"
+    static let requireConfirmationKey = "devmaid.requireConfirmation"
+    static let requireDangerConfirmationKey = "devmaid.requireDangerConfirmation"
+    static let includedCategoriesKey = "devmaid.includedCategories"
+    static let languageKey = "devmaid.language"
+    static let autoCheckUpdatesKey = "devmaid.autoCheckUpdates"
+    static let lastUpdateCheckKey = "devmaid.lastUpdateCheck"
     static let notificationsEnabledKey = "devmaid.notificationsEnabled"
     static let freeSpaceAlertThresholdGBKey = "devmaid.freeSpaceAlertThresholdGB"
     static let reclaimableSpikeThresholdGBKey = "devmaid.reclaimableSpikeThresholdGB"
@@ -142,7 +150,7 @@ enum AppPreferences {
 
     static var isVolatileEnvironment: Bool {
         let env = ProcessInfo.processInfo.environment
-        return env["DEVMAID_VOLATILE_PREFERENCES"] == "1" || env["ROOMSERVICE_VOLATILE_PREFERENCES"] == "1"
+        return env["DEVMAID_VOLATILE_PREFERENCES"] == "1" || env["DEVMAID_VOLATILE_PREFERENCES"] == "1"
     }
 
     static func loadSearchRoots() -> [String] {
@@ -154,7 +162,7 @@ enum AppPreferences {
            !override.isEmpty {
             return override
         }
-        if let override = env["ROOMSERVICE_SEARCH_ROOTS"]?
+        if let override = env["DEVMAID_SEARCH_ROOTS"]?
             .split(separator: ":")
             .map({ String($0) })
             .filter({ !$0.isEmpty }),
@@ -164,7 +172,7 @@ enum AppPreferences {
         if let roots = UserDefaults.standard.stringArray(forKey: searchRootsKey), !roots.isEmpty {
             return roots
         }
-        return RoomServicePaths.defaultSearchRoots()
+        return DevMaidPaths.defaultSearchRoots()
     }
 
     static func saveSearchRoots(_ roots: [String]) {
@@ -203,7 +211,7 @@ enum AppPreferences {
            let language = AppLanguage(rawValue: override) {
             return language
         }
-        if let override = env["ROOMSERVICE_LANGUAGE"],
+        if let override = env["DEVMAID_LANGUAGE"],
            let language = AppLanguage(rawValue: override) {
             return language
         }
@@ -260,12 +268,12 @@ enum AppPreferences {
 }
 
 @MainActor
-final class RoomServiceAppModel: ObservableObject {
-    @Published var destination: RoomServiceDestination = .overview
+final class DevMaidAppModel: ObservableObject {
+    @Published var destination: DevMaidDestination = .overview
     @Published var language: AppLanguage
     @Published var scanSummary: ScanSummary?
     @Published var isScanning = false
-    @Published var currentOperation: RoomServiceOperation?
+    @Published var currentOperation: DevMaidOperation?
     @Published var scanWarnings: [String] = []
     @Published var searchRoots: [String]
     @Published var excludedPaths: [String]
@@ -307,9 +315,22 @@ final class RoomServiceAppModel: ObservableObject {
     private let scanHistoryStore = ScanHistoryStore()
     private var hasPerformedLaunchTasks = false
 
+    private var launchDestinationOverride: DevMaidDestination? {
+        let env = ProcessInfo.processInfo.environment
+        if let rawValue = env["DEVMAID_LAUNCH_DESTINATION"] ?? env["ROOMSERVICE_LAUNCH_DESTINATION"] {
+            return DevMaidDestination(rawValue: rawValue)
+        }
+        return nil
+    }
+
+    private var shouldAutoRunScanOnLaunch: Bool {
+        let env = ProcessInfo.processInfo.environment
+        return env["DEVMAID_AUTO_RUN_SCAN_ON_LAUNCH"] == "1" || env["ROOMSERVICE_AUTO_RUN_SCAN_ON_LAUNCH"] == "1"
+    }
+
     private var testScanDelayNanoseconds: UInt64 {
         let env = ProcessInfo.processInfo.environment
-        guard let rawValue = env["DEVMAID_TEST_SCAN_DELAY_MS"] ?? env["ROOMSERVICE_TEST_SCAN_DELAY_MS"],
+        guard let rawValue = env["DEVMAID_TEST_SCAN_DELAY_MS"] ?? env["DEVMAID_TEST_SCAN_DELAY_MS"],
               let milliseconds = UInt64(rawValue) else {
             return 0
         }
@@ -332,6 +353,9 @@ final class RoomServiceAppModel: ObservableObject {
         self.showOnboarding = AppPreferences.isVolatileEnvironment
             ? false
             : AppPreferences.loadBool(key: AppPreferences.completedOnboardingKey, default: false) == false
+        if let launchDestinationOverride {
+            self.destination = launchDestinationOverride
+        }
         refreshHistory()
         loadRecentScans()
     }
@@ -360,6 +384,7 @@ final class RoomServiceAppModel: ObservableObject {
             items = items.filter {
                 $0.path.localizedCaseInsensitiveContains(query) ||
                 $0.category.displayName.localizedCaseInsensitiveContains(query) ||
+                $0.category.localizedDisplayName(in: language).localizedCaseInsensitiveContains(query) ||
                 $0.category.localizedShortDescription(in: language).localizedCaseInsensitiveContains(query) ||
                 $0.category.localizedNote(in: language).localizedCaseInsensitiveContains(query) ||
                 $0.note.localizedCaseInsensitiveContains(query)
@@ -447,6 +472,28 @@ final class RoomServiceAppModel: ObservableObject {
         filteredItems.reduce(0) { $0 + $1.bytes }
     }
 
+    var resultGroups: [ResultGroupSummary] {
+        let grouped = Dictionary(grouping: filteredItems) { item in
+            item.groupName?.isEmpty == false ? item.groupName! : item.category.localizedDisplayName(in: language)
+        }
+
+        return grouped.map { key, items in
+            ResultGroupSummary(
+                id: key,
+                title: key,
+                itemCount: items.count,
+                totalBytes: items.reduce(0) { $0 + $1.bytes },
+                highestRisk: items.map(\.risk).max() ?? .safe
+            )
+        }
+        .sorted { lhs, rhs in
+            if lhs.totalBytes == rhs.totalBytes {
+                return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
+            }
+            return lhs.totalBytes > rhs.totalBytes
+        }
+    }
+
     var filteredStartupItems: [StartupItem] {
         switch startupItemsFilter {
         case .all:
@@ -456,8 +503,8 @@ final class RoomServiceAppModel: ObservableObject {
         }
     }
 
-    var copy: RoomServiceCopy {
-        RoomServiceCopy(language: language)
+    var copy: DevMaidCopy {
+        DevMaidCopy(language: language)
     }
 
     var currentAppVersion: String {
@@ -484,7 +531,7 @@ final class RoomServiceAppModel: ObservableObject {
         availableUpdate?.summary ?? unsupportedSystemUpdate?.summary
     }
 
-    var updateState: RoomServiceUpdateState {
+    var updateState: DevMaidUpdateState {
         if isCheckingForUpdates {
             return .checking
         }
@@ -543,7 +590,7 @@ final class RoomServiceAppModel: ObservableObject {
                 if testDelayNanoseconds > 0 {
                     try? await Task.sleep(nanoseconds: testDelayNanoseconds)
                 }
-                return RoomServiceScanner().scan(
+                return DevMaidScanner().scan(
                     ScanConfiguration(
                         categories: categories,
                         searchRoots: roots,
@@ -562,7 +609,7 @@ final class RoomServiceAppModel: ObservableObject {
                 self.selectedScanItemIDs = Set(summary.items.prefix(1).map(\.id))
                 self.lastActionMessage = self.copy.scanFinishedMessage(
                     items: summary.itemCount,
-                    bytes: RoomServiceFormatters.byteString(summary.totalBytes)
+                    bytes: DevMaidFormatters.byteString(summary.totalBytes)
                 )
             }
 
@@ -733,7 +780,7 @@ final class RoomServiceAppModel: ObservableObject {
         guard let selectedSearchRoot else { return }
         searchRoots.removeAll { $0 == selectedSearchRoot }
         if searchRoots.isEmpty {
-            searchRoots = RoomServicePaths.defaultSearchRoots()
+            searchRoots = DevMaidPaths.defaultSearchRoots()
         }
         AppPreferences.saveSearchRoots(searchRoots)
         self.selectedSearchRoot = nil
@@ -741,7 +788,7 @@ final class RoomServiceAppModel: ObservableObject {
     }
 
     func resetSearchRoots() {
-        searchRoots = RoomServicePaths.defaultSearchRoots()
+        searchRoots = DevMaidPaths.defaultSearchRoots()
         AppPreferences.saveSearchRoots(searchRoots)
         selectedSearchRoot = nil
         lastActionMessage = copy.resetScanRootsMessage
@@ -781,11 +828,19 @@ final class RoomServiceAppModel: ObservableObject {
 
     func revealPrimaryItemInFinder() {
         guard let item = primarySelectedItem else { return }
+        reveal(item)
+    }
+
+    func reveal(_ item: ScanItem) {
         NSWorkspace.shared.activateFileViewerSelecting([URL(fileURLWithPath: item.path)])
     }
 
     func openPrimaryItemInTerminal() {
         guard let item = primarySelectedItem else { return }
+        openInTerminal(item)
+    }
+
+    func openInTerminal(_ item: ScanItem) {
         let targetURL = URL(fileURLWithPath: item.path)
         let directoryURL = targetURL.hasDirectoryPath ? targetURL : targetURL.deletingLastPathComponent()
         let script = """
@@ -906,7 +961,7 @@ final class RoomServiceAppModel: ObservableObject {
     }
 
     func openPrivacyPolicy() {
-        NSWorkspace.shared.open(RoomServiceLinks.privacy)
+        NSWorkspace.shared.open(DevMaidLinks.privacy)
     }
 
     func handleInitialLoad() {
@@ -919,6 +974,10 @@ final class RoomServiceAppModel: ObservableObject {
             if notificationsEnabled {
                 await NotificationManager.requestAuthorizationIfNeeded()
             }
+        }
+
+        if shouldAutoRunScanOnLaunch && scanSummary == nil && canScan {
+            runScan()
         }
 
         guard automaticallyCheckForUpdates else { return }
@@ -1026,7 +1085,7 @@ final class RoomServiceAppModel: ObservableObject {
         AppPreferences.saveDate(Date(), key: AppPreferences.lastLowSpaceAlertKey)
         await NotificationManager.post(
             title: copy.lowSpaceAlertTitle,
-            body: copy.lowSpaceAlertBody(free: RoomServiceFormatters.byteString(snapshot.freeBytes)),
+            body: copy.lowSpaceAlertBody(free: DevMaidFormatters.byteString(snapshot.freeBytes)),
             identifier: "devmaid.low-space"
         )
     }
@@ -1042,7 +1101,7 @@ final class RoomServiceAppModel: ObservableObject {
         AppPreferences.saveDate(Date(), key: AppPreferences.lastSpikeAlertKey)
         await NotificationManager.post(
             title: copy.reclaimableSpikeAlertTitle,
-            body: copy.reclaimableSpikeAlertBody(delta: RoomServiceFormatters.byteString(delta)),
+            body: copy.reclaimableSpikeAlertBody(delta: DevMaidFormatters.byteString(delta)),
             identifier: "devmaid.reclaimable-spike"
         )
     }

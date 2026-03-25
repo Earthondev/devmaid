@@ -1,6 +1,6 @@
 # Privacy
 
-RoomService is designed to run locally on your Mac.
+DevMaid is designed to run locally on your Mac.
 
 - scans are performed on-device
 - cleanup history stays on-device

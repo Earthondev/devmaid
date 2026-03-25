@@ -69,7 +69,7 @@ brew install --cask https://github.com/Earthondev/devmaid/releases/latest/downlo
 
 - `DevMaid.app` is the native macOS interface
 - `devmaid` is the CLI for automation and shell workflows
-- both products use `RoomServiceKit` as the cleanup engine
+- both products use `DevMaidKit` as the cleanup engine
 - GitHub Releases is the main public download page for the free app
 - the Homebrew tap lives at [Earthondev/homebrew-devmaid](https://github.com/Earthondev/homebrew-devmaid)
 
@@ -101,14 +101,14 @@ The update feed is a JSON document shaped like:
 The recommended support channels are:
 
 - bugs and regressions: GitHub Issues
-- usage questions: GitHub Discussions or [SUPPORT.md](/Users/earthondev/Desktop/RoomService/SUPPORT.md)
-- security reports: [SECURITY.md](/Users/earthondev/Desktop/RoomService/SECURITY.md)
-- contribution guide: [CONTRIBUTING.md](/Users/earthondev/Desktop/RoomService/CONTRIBUTING.md)
-- community expectations: [CODE_OF_CONDUCT.md](/Users/earthondev/Desktop/RoomService/CODE_OF_CONDUCT.md)
+- usage questions: GitHub Discussions or [SUPPORT.md](SUPPORT.md)
+- security reports: [SECURITY.md](SECURITY.md)
+- contribution guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- community expectations: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
 
 ## Support the maintainer
 
-This repo now includes a funding plan in [FUNDING.md](/Users/earthondev/Desktop/RoomService/docs/FUNDING.md) so support channels stay consistent across the app, the CLI, and GitHub.
+This repo now includes a funding plan in [FUNDING.md](docs/FUNDING.md) so support channels stay consistent across the app, the CLI, and GitHub.
 
 Recommended support options:
 
@@ -117,7 +117,7 @@ Recommended support options:
 - GitHub Sponsors or another recurring-support service for maintenance
 - company sponsorships for roadmap priorities, support, or custom cleanup rules
 
-The live GitHub funding config is in [.github/FUNDING.yml](/Users/earthondev/Desktop/RoomService/.github/FUNDING.yml), and a reusable template remains in [.github/FUNDING.yml.example](/Users/earthondev/Desktop/RoomService/.github/FUNDING.yml.example).
+The live GitHub funding config is in [.github/FUNDING.yml](.github/FUNDING.yml), and a reusable template remains in [.github/FUNDING.yml.example](.github/FUNDING.yml.example).
 
 ## Why this exists
 
@@ -168,7 +168,6 @@ Run `devmaid categories` for descriptions and risk labels.
 ## Build
 
 ```bash
-cd /Users/earthondev/Desktop/RoomService
 swift build
 ```
 
@@ -303,10 +302,10 @@ Homebrew formulas can be generated with:
 ./scripts/generate_homebrew_formula.sh --help
 ```
 
-The release workflow and knobs are documented in [DISTRIBUTION.md](/Users/earthondev/Desktop/RoomService/docs/DISTRIBUTION.md).
-Signing and notarization setup is documented in [SIGNING_AND_NOTARIZATION.md](/Users/earthondev/Desktop/RoomService/docs/SIGNING_AND_NOTARIZATION.md).
-Landing-page and launch copy live in [LANDING_PAGE_COPY.md](/Users/earthondev/Desktop/RoomService/docs/LANDING_PAGE_COPY.md), [LAUNCH_POSTS.md](/Users/earthondev/Desktop/RoomService/docs/LAUNCH_POSTS.md), and [MEDIA_KIT.md](/Users/earthondev/Desktop/RoomService/docs/MEDIA_KIT.md).
-The public launch checklist is in [LAUNCH_CHECKLIST.md](/Users/earthondev/Desktop/RoomService/docs/LAUNCH_CHECKLIST.md).
+The release workflow and knobs are documented in [DISTRIBUTION.md](docs/DISTRIBUTION.md).
+Signing and notarization setup is documented in [SIGNING_AND_NOTARIZATION.md](docs/SIGNING_AND_NOTARIZATION.md).
+Landing-page and launch copy live in [LANDING_PAGE_COPY.md](docs/LANDING_PAGE_COPY.md), [LAUNCH_POSTS.md](docs/LAUNCH_POSTS.md), and [MEDIA_KIT.md](docs/MEDIA_KIT.md).
+The public launch checklist is in [LAUNCH_CHECKLIST.md](docs/LAUNCH_CHECKLIST.md).
 
 This repo also ships GitHub Actions for:
 

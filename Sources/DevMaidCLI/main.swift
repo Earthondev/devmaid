@@ -1,12 +1,12 @@
 import Foundation
-import RoomServiceKit
+import DevMaidKit
 
 struct CLIError: Error, CustomStringConvertible {
     let description: String
 }
 
 @main
-struct RoomServiceCLI {
+struct DevMaidCLI {
     static func main() {
         do {
             try run()
@@ -94,7 +94,7 @@ struct RoomServiceCLI {
         }
 
         if let paths = options.values["path"], !paths.isEmpty {
-            let expandedPaths = Set(paths.map { RoomServicePaths.expandedHomePath($0) })
+            let expandedPaths = Set(paths.map { DevMaidPaths.expandedHomePath($0) })
             selected = selected.filter { expandedPaths.contains($0.path) }
         }
 
@@ -277,14 +277,14 @@ struct RoomServiceCLI {
         )
     }
 
-    private static func makeScanner() -> RoomServiceScanner {
-        RoomServiceScanner()
+    private static func makeScanner() -> DevMaidScanner {
+        DevMaidScanner()
     }
 
     private static func scanConfiguration(from options: ParsedOptions) -> ScanConfiguration {
-        let searchRoots = options.values["search-root"]?.map { RoomServicePaths.expandedHomePath($0) }
-            ?? RoomServicePaths.defaultSearchRoots()
-        let excludedPaths = options.values["exclude"]?.map { RoomServicePaths.expandedHomePath($0) } ?? []
+        let searchRoots = options.values["search-root"]?.map { DevMaidPaths.expandedHomePath($0) }
+            ?? DevMaidPaths.defaultSearchRoots()
+        let excludedPaths = options.values["exclude"]?.map { DevMaidPaths.expandedHomePath($0) } ?? []
         let categories = (try? parseCategories(options.values["category"] ?? [])) ?? CleanupCategory.allCases
         let maxItems = options.values["limit"]?.last.flatMap(Int.init)
         return ScanConfiguration(
@@ -322,7 +322,7 @@ struct RoomServiceCLI {
         let data = try encoder.encode(value)
 
         if let outputPath, !outputPath.isEmpty {
-            let expandedPath = RoomServicePaths.expandedHomePath(outputPath)
+            let expandedPath = DevMaidPaths.expandedHomePath(outputPath)
             try data.write(to: URL(fileURLWithPath: expandedPath))
             print("Wrote export to \(expandedPath)")
             return

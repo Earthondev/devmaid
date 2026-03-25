@@ -1,10 +1,10 @@
 import SwiftUI
-import RoomServiceKit
+import DevMaidKit
 
-struct RoomServiceRootView: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
+struct DevMaidRootView: View {
+    @EnvironmentObject private var model: DevMaidAppModel
 
-    private var copy: RoomServiceCopy { model.copy }
+    private var copy: DevMaidCopy { model.copy }
 
     var body: some View {
         NavigationSplitView {
@@ -12,16 +12,16 @@ struct RoomServiceRootView: View {
                 .navigationSplitViewColumnWidth(min: 212, ideal: 236, max: 260)
         } detail: {
             ZStack {
-                RoomServiceBackground()
+                DevMaidBackground()
 
                 VStack(spacing: 16) {
                     if let message = model.lastActionMessage {
-                        BannerMessage(text: message, systemImage: "checkmark.seal.fill", tint: RoomServicePalette.safe)
+                        BannerMessage(text: message, systemImage: "checkmark.seal.fill", tint: DevMaidPalette.safe)
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
                     if let error = model.lastError {
-                        BannerMessage(text: error, systemImage: "exclamationmark.octagon.fill", tint: RoomServicePalette.danger)
+                        BannerMessage(text: error, systemImage: "exclamationmark.octagon.fill", tint: DevMaidPalette.danger)
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
@@ -29,7 +29,7 @@ struct RoomServiceRootView: View {
                         BannerMessage(
                             text: copy.skippedRestoreBanner,
                             systemImage: "arrow.triangle.2.circlepath.circle.fill",
-                            tint: RoomServicePalette.review
+                            tint: DevMaidPalette.review
                         )
                         .transition(.move(edge: .top).combined(with: .opacity))
                     }
@@ -82,7 +82,7 @@ struct RoomServiceRootView: View {
     private var sidebar: some View {
         VStack(spacing: 0) {
             HStack(spacing: 12) {
-                RoomServiceMark()
+                DevMaidMark()
                     .frame(width: 28, height: 28)
 
                 Text(copy.appName)
@@ -96,7 +96,7 @@ struct RoomServiceRootView: View {
 
             ScrollView {
                 VStack(spacing: 6) {
-                    ForEach(RoomServiceDestination.allCases) { destination in
+                    ForEach(DevMaidDestination.allCases) { destination in
                         SidebarNavigationButton(
                             title: destination.title(in: model.language),
                             systemImage: destination.symbolName,
@@ -118,10 +118,10 @@ struct RoomServiceRootView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     Text(copy.sidebarTagline)
                         .font(.system(size: 13, weight: .bold, design: .rounded))
-                        .foregroundStyle(RoomServicePalette.ink)
+                        .foregroundStyle(DevMaidPalette.ink)
                     Text(copy.sidebarDetail)
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(RoomServicePalette.muted)
+                        .foregroundStyle(DevMaidPalette.muted)
                 }
             }
             .padding(14)
@@ -130,7 +130,7 @@ struct RoomServiceRootView: View {
         .background(
             ZStack {
                 LinearGradient(
-                    colors: [RoomServicePalette.sidebar, RoomServicePalette.sidebarSecondary],
+                    colors: [DevMaidPalette.sidebar, DevMaidPalette.sidebarSecondary],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
@@ -163,11 +163,15 @@ struct RoomServiceRootView: View {
 }
 
 struct OverviewScreen: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
-    private var copy: RoomServiceCopy { model.copy }
+    @EnvironmentObject private var model: DevMaidAppModel
+    private var copy: DevMaidCopy { model.copy }
 
     private let grid = [
         GridItem(.adaptive(minimum: 220), spacing: 16),
+    ]
+
+    private let actionGrid = [
+        GridItem(.adaptive(minimum: 240), spacing: 16),
     ]
 
     var body: some View {
@@ -181,19 +185,19 @@ struct OverviewScreen: View {
                                     .font(.system(size: 12, weight: .bold, design: .rounded))
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 7)
-                                    .background(RoomServicePalette.accent.opacity(0.12), in: Capsule())
-                                    .foregroundStyle(RoomServicePalette.accent)
+                                    .background(DevMaidPalette.accent.opacity(0.12), in: Capsule())
+                                    .foregroundStyle(DevMaidPalette.accent)
 
                                 Text(copy.heroScope)
                                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                                    .foregroundStyle(RoomServicePalette.muted)
+                                    .foregroundStyle(DevMaidPalette.muted)
                             }
 
                             WordmarkLockup(subtitle: copy.tagline)
 
                             Text(copy.heroDescription)
                                 .font(.system(size: 15, weight: .medium))
-                                .foregroundStyle(RoomServicePalette.muted)
+                                .foregroundStyle(DevMaidPalette.muted)
                                 .frame(maxWidth: 640, alignment: .leading)
 
                             HStack(spacing: 10) {
@@ -229,7 +233,7 @@ struct OverviewScreen: View {
                         Spacer()
 
                         VStack(spacing: 18) {
-                            RoomServiceMark()
+                            DevMaidMark()
                                 .frame(width: 168, height: 168)
 
                             HStack(spacing: 10) {
@@ -244,7 +248,7 @@ struct OverviewScreen: View {
                 HStack(spacing: 16) {
                     MetricCard(
                         title: copy.reclaimableStorageTitle,
-                        value: RoomServiceFormatters.byteString(model.reclaimableBytes),
+                        value: DevMaidFormatters.byteString(model.reclaimableBytes),
                         detail: copy.reclaimableStorageDetail,
                         symbolName: "internaldrive.fill"
                     )
@@ -266,6 +270,52 @@ struct OverviewScreen: View {
                         detail: copy.weeklyTrendDetail,
                         symbolName: "chart.line.uptrend.xyaxis"
                     )
+                }
+
+                VStack(alignment: .leading, spacing: 16) {
+                    SectionTitleRow(
+                        title: copy.overviewActionsTitle,
+                        detail: copy.overviewActionsDetail
+                    )
+
+                    LazyVGrid(columns: actionGrid, spacing: 16) {
+                        ActionDeckCard(
+                            eyebrow: copy.heroBadge,
+                            title: copy.overviewActionScanTitle,
+                            detail: copy.overviewActionScanDetail,
+                            symbolName: "sparkles.rectangle.stack.fill",
+                            tint: DevMaidPalette.accent,
+                            buttonTitle: copy.toolbarRunScan
+                        ) {
+                            model.runScan()
+                        }
+
+                        ActionDeckCard(
+                            eyebrow: copy.scanResultsTitle,
+                            title: copy.overviewActionResultsTitle,
+                            detail: copy.overviewActionResultsDetail,
+                            symbolName: "checklist.checked",
+                            tint: DevMaidPalette.safe,
+                            buttonTitle: copy.openResults
+                        ) {
+                            withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
+                                model.destination = .results
+                            }
+                        }
+
+                        ActionDeckCard(
+                            eyebrow: copy.settingsTitle,
+                            title: copy.overviewActionSettingsTitle,
+                            detail: copy.overviewActionSettingsDetail,
+                            symbolName: "slider.horizontal.3",
+                            tint: DevMaidPalette.review,
+                            buttonTitle: copy.onboardingOpenSettingsAction
+                        ) {
+                            withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
+                                model.destination = .settings
+                            }
+                        }
+                    }
                 }
 
                 VStack(alignment: .leading, spacing: 16) {
@@ -292,14 +342,14 @@ struct OverviewScreen: View {
                         VStack(alignment: .leading, spacing: 14) {
                             Text(copy.riskLabelsTitle)
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                                .foregroundStyle(RoomServicePalette.ink)
+                                .foregroundStyle(DevMaidPalette.ink)
 
                             ForEach(RiskLevel.allCases, id: \.self) { risk in
                                 HStack(alignment: .top, spacing: 12) {
                                     RiskBadge(risk: risk, language: model.language)
                                     Text(risk.localizedDetail(in: model.language))
                                         .font(.system(size: 13))
-                                        .foregroundStyle(RoomServicePalette.muted)
+                                        .foregroundStyle(DevMaidPalette.muted)
                                 }
                             }
                         }
@@ -310,7 +360,7 @@ struct OverviewScreen: View {
                         VStack(alignment: .leading, spacing: 14) {
                             Text(copy.weeklyTrendTitle)
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                                .foregroundStyle(RoomServicePalette.ink)
+                                .foregroundStyle(DevMaidPalette.ink)
 
                             if model.weeklyTrendPoints.count >= 2 {
                                 TrendSparkline(points: model.weeklyTrendPoints.map(\.reclaimableBytes))
@@ -331,7 +381,7 @@ struct OverviewScreen: View {
                             } else {
                                 Text(copy.noTrendData)
                                     .font(.system(size: 13))
-                                    .foregroundStyle(RoomServicePalette.muted)
+                                    .foregroundStyle(DevMaidPalette.muted)
                             }
                         }
                     }
@@ -341,22 +391,22 @@ struct OverviewScreen: View {
                         VStack(alignment: .leading, spacing: 14) {
                             Text(copy.recentActivityTitle)
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                                .foregroundStyle(RoomServicePalette.ink)
+                                .foregroundStyle(DevMaidPalette.ink)
 
                             if let latest = model.latestCleanupEntry {
                                 Text(latest.summary)
                                     .font(.system(size: 14, weight: .semibold))
-                                    .foregroundStyle(RoomServicePalette.ink)
-                                Text(RoomServiceFormatters.dateTimeString(latest.createdAt))
+                                    .foregroundStyle(DevMaidPalette.ink)
+                                Text(DevMaidFormatters.dateTimeString(latest.createdAt))
                                     .font(.system(size: 12))
-                                    .foregroundStyle(RoomServicePalette.muted)
-                                Text(copy.latestCleanupStats(items: latest.itemCount, bytes: RoomServiceFormatters.byteString(latest.totalBytes)))
+                                    .foregroundStyle(DevMaidPalette.muted)
+                                Text(copy.latestCleanupStats(items: latest.itemCount, bytes: DevMaidFormatters.byteString(latest.totalBytes)))
                                     .font(.system(size: 13))
-                                    .foregroundStyle(RoomServicePalette.muted)
+                                    .foregroundStyle(DevMaidPalette.muted)
                             } else {
                                 Text(copy.noRecentActivity)
                                     .font(.system(size: 13))
-                                    .foregroundStyle(RoomServicePalette.muted)
+                                    .foregroundStyle(DevMaidPalette.muted)
                             }
                         }
                     }
@@ -389,17 +439,56 @@ struct OverviewScreen: View {
 }
 
 struct ResultsScreen: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
-    private var copy: RoomServiceCopy { model.copy }
+    @EnvironmentObject private var model: DevMaidAppModel
+    private var copy: DevMaidCopy { model.copy }
+    private let workflowGrid = [
+        GridItem(.adaptive(minimum: 220), spacing: 12),
+    ]
 
     var body: some View {
         HStack(spacing: 18) {
             VStack(alignment: .leading, spacing: 16) {
                 resultsHeader
+                workflowStrip
                 HStack(spacing: 12) {
                     InfoChip(title: copy.visibleItemsLabel, value: "\(model.filteredItems.count)", symbolName: "shippingbox.fill")
-                    InfoChip(title: copy.visibleSizeLabel, value: RoomServiceFormatters.byteString(model.visibleBytes), symbolName: "internaldrive.fill")
+                    InfoChip(title: copy.visibleSizeLabel, value: DevMaidFormatters.byteString(model.visibleBytes), symbolName: "internaldrive.fill")
                     InfoChip(title: copy.selectedLabel, value: "\(model.selectedScanItems.count)", symbolName: "checkmark.circle.fill")
+                    InfoChip(title: copy.groupedByProjectLabel, value: "\(model.resultGroups.count)", symbolName: "square.stack.3d.up.fill")
+                }
+
+                if !model.selectedScanItems.isEmpty {
+                    SurfaceCard {
+                        VStack(alignment: .leading, spacing: 12) {
+                            HStack(alignment: .center, spacing: 16) {
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(copy.batchCleanupTitle)
+                                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                                        .foregroundStyle(DevMaidPalette.ink)
+                                    Text(copy.selectedItemsTitle(count: model.selectedScanItems.count))
+                                        .font(.system(size: 13, weight: .medium))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                }
+
+                                Spacer()
+
+                                Text(DevMaidFormatters.byteString(model.selectedScanItems.reduce(0) { $0 + $1.bytes }))
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                                    .foregroundStyle(DevMaidPalette.ink)
+
+                                Button(copy.toolbarQuarantineSelected) {
+                                    model.requestCleanup()
+                                }
+                                .buttonStyle(.borderedProminent)
+                                .disabled(!model.canCleanupSelection)
+                            }
+
+                            Text(selectionRiskDetail)
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundStyle(DevMaidPalette.muted)
+                        }
+                    }
+                    .transition(.move(edge: .top).combined(with: .opacity))
                 }
 
                 SurfaceCard(padding: 0) {
@@ -407,37 +496,57 @@ struct ResultsScreen: View {
                         filterBar
                             .padding(18)
 
+                        if !model.resultGroups.isEmpty {
+                            groupedSummaryStrip
+                                .padding(.horizontal, 18)
+                                .padding(.bottom, 18)
+                        }
+
                         if model.filteredItems.isEmpty {
                             emptyResults
                                 .padding(.horizontal, 18)
                                 .padding(.bottom, 18)
                         } else {
                             Table(model.filteredItems, selection: $model.selectedScanItemIDs) {
-                                TableColumn(copy.categoryFilterLabel) { item in
-                                    VStack(alignment: .leading, spacing: 2) {
-                                        HStack {
-                                            Image(systemName: item.category.symbolName)
-                                            Text(item.category.displayName)
-                                        }
-                                        if let groupName = item.groupName {
-                                            Text(groupName)
-                                                .font(.system(size: 11, weight: .medium))
-                                                .foregroundStyle(RoomServicePalette.muted)
-                                        }
-                                    }
+                                TableColumn(copy.itemColumnTitle) { item in
+                                    ResultLocationCell(
+                                        title: itemDisplayName(for: item),
+                                        parentPath: parentDirectoryPath(for: item),
+                                        groupName: item.groupName
+                                    )
+                                    .help(item.path)
                                 }
+                                .width(min: 300, ideal: 420)
+                                TableColumn(copy.categoryFilterLabel) { item in
+                                    ResultCategoryCell(category: item.category, language: model.language)
+                                }
+                                .width(min: 180, ideal: 220)
                                 TableColumn(copy.riskFilterLabel) { item in
                                     RiskBadge(risk: item.risk, language: model.language)
                                 }
+                                .width(min: 110, ideal: 120)
                                 TableColumn(copy.bytesMetricTitle) { item in
-                                    Text(RoomServiceFormatters.byteString(item.bytes))
+                                    Text(DevMaidFormatters.byteString(item.bytes))
                                         .font(.system(.body, design: .monospaced))
+                                        .foregroundStyle(DevMaidPalette.ink)
                                 }
-                                TableColumn(copy.pathTitle) { item in
-                                    Text(item.path)
-                                        .lineLimit(1)
-                                        .truncationMode(.middle)
+                                .width(min: 108, ideal: 124)
+                                TableColumn(copy.actionsColumnTitle) { item in
+                                    Menu {
+                                        Button(copy.showInFinderAction) {
+                                            model.reveal(item)
+                                        }
+                                        Button(copy.openInTerminalAction) {
+                                            model.openInTerminal(item)
+                                        }
+                                    } label: {
+                                        Image(systemName: "ellipsis.circle")
+                                            .font(.system(size: 15, weight: .semibold))
+                                            .foregroundStyle(DevMaidPalette.accent)
+                                    }
+                                    .menuStyle(.borderlessButton)
                                 }
+                                .width(min: 54, ideal: 60, max: 60)
                             }
                             .tableStyle(.inset(alternatesRowBackgrounds: true))
                             .frame(maxHeight: .infinity)
@@ -453,7 +562,7 @@ struct ResultsScreen: View {
                             ForEach(model.scanWarnings, id: \.self) { warning in
                                 Text("• \(warning)")
                                     .font(.system(size: 12))
-                                    .foregroundStyle(RoomServicePalette.muted)
+                                    .foregroundStyle(DevMaidPalette.muted)
                             }
                         }
                     }
@@ -464,6 +573,8 @@ struct ResultsScreen: View {
             inspector
                 .frame(width: 320)
         }
+        .animation(.spring(response: 0.34, dampingFraction: 0.84), value: model.selectedScanItemIDs)
+        .animation(.easeInOut(duration: 0.22), value: model.filteredItems.count)
         .alert(copy.reviewCleanupTitle, isPresented: $model.showCleanupConfirmation) {
             Button(copy.cancel, role: .cancel) {}
             Button(copy.quarantineAction) { model.performCleanup() }
@@ -483,9 +594,9 @@ struct ResultsScreen: View {
             VStack(alignment: .leading, spacing: 6) {
                 Text(copy.scanResultsTitle)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
-                Text(copy.visibleSummary(count: model.filteredItems.count, bytes: RoomServiceFormatters.byteString(model.visibleBytes)))
+                Text(copy.visibleSummary(count: model.filteredItems.count, bytes: DevMaidFormatters.byteString(model.visibleBytes)))
                     .font(.system(size: 13))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
             }
             Spacer()
             if model.canExportScan {
@@ -501,49 +612,118 @@ struct ResultsScreen: View {
         }
     }
 
+    private var workflowStrip: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionTitleRow(
+                title: copy.resultsWorkflowTitle,
+                detail: copy.resultsWorkflowDetail
+            )
+
+            LazyVGrid(columns: workflowGrid, spacing: 12) {
+                WorkflowStepPill(
+                    index: 1,
+                    title: copy.toolbarRunScan,
+                    detail: copy.resultsWorkflowScanDetail,
+                    symbolName: "sparkles",
+                    tint: DevMaidPalette.accent
+                )
+                WorkflowStepPill(
+                    index: 2,
+                    title: copy.scanResultsTitle,
+                    detail: copy.resultsWorkflowReviewDetail(count: model.filteredItems.count, bytes: DevMaidFormatters.byteString(model.visibleBytes)),
+                    symbolName: "line.3.horizontal.decrease.circle.fill",
+                    tint: DevMaidPalette.review
+                )
+                WorkflowStepPill(
+                    index: 3,
+                    title: copy.toolbarQuarantineSelected,
+                    detail: copy.resultsWorkflowQuarantineDetail,
+                    symbolName: "archivebox.fill",
+                    tint: DevMaidPalette.safe
+                )
+            }
+        }
+    }
+
+    private var groupedSummaryStrip: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            SectionTitleRow(
+                title: copy.groupedResultsTitle,
+                detail: copy.groupedResultsDetail
+            )
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(model.resultGroups.prefix(6)) { group in
+                        GroupSummaryCard(
+                            title: group.title,
+                            itemCount: group.itemCount,
+                            totalBytes: group.totalBytes,
+                            risk: group.highestRisk,
+                            language: model.language
+                        )
+                        .frame(width: 220)
+                    }
+                }
+                .padding(.vertical, 2)
+            }
+        }
+    }
+
     private var filterBar: some View {
-        HStack(spacing: 12) {
-            TextField(copy.filterPlaceholder, text: $model.searchText)
-                .textFieldStyle(.roundedBorder)
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                TextField(copy.filterPlaceholder, text: $model.searchText)
+                    .textFieldStyle(.roundedBorder)
 
-            Picker(copy.categoryFilterLabel, selection: $model.categoryFilter) {
-                Text(copy.allCategories).tag(CleanupCategory?.none)
-                ForEach(CleanupCategory.allCases, id: \.self) { category in
-                    Text(category.displayName).tag(CleanupCategory?.some(category))
-                }
-            }
-            .frame(width: 190)
-
-            Picker(copy.riskFilterLabel, selection: $model.riskFilter) {
-                Text(copy.allRisk).tag(RiskLevel?.none)
-                ForEach(RiskLevel.allCases, id: \.self) { risk in
-                    Text(risk.localizedDisplayName(in: model.language)).tag(RiskLevel?.some(risk))
-                }
-            }
-            .frame(width: 150)
-
-            Picker(copy.sortLabel, selection: $model.sortOption) {
-                ForEach(ScanSortOption.allCases) { option in
-                    Text(option.title(in: model.language)).tag(option)
-                }
-            }
-            .frame(width: 140)
-
-            Menu(copy.selectionActionsTitle) {
-                Button(copy.selectAllVisibleAction) { model.selectAllVisibleResults() }
-                Button(copy.clearSelectionAction) { model.clearResultSelection() }
-                Divider()
-                Button(copy.selectSafeAction) { model.selectVisibleResults(for: .safe) }
-                Button(copy.selectReviewAction) { model.selectVisibleResults(for: .review) }
-                Button(copy.selectDangerAction) { model.selectVisibleResults(for: .danger) }
-                Divider()
-                Button(copy.selectLargeItemsAction) { model.selectVisibleResults(minimumBytes: 1_073_741_824) }
-                Menu(copy.categoryFilterLabel) {
+                Picker(copy.categoryFilterLabel, selection: $model.categoryFilter) {
+                    Text(copy.allCategories).tag(CleanupCategory?.none)
                     ForEach(CleanupCategory.allCases, id: \.self) { category in
-                        Button(category.displayName) {
-                            model.selectVisibleResults(for: category)
+                        Text(category.localizedDisplayName(in: model.language)).tag(CleanupCategory?.some(category))
+                    }
+                }
+                .frame(width: 190)
+
+                Picker(copy.riskFilterLabel, selection: $model.riskFilter) {
+                    Text(copy.allRisk).tag(RiskLevel?.none)
+                    ForEach(RiskLevel.allCases, id: \.self) { risk in
+                        Text(risk.localizedDisplayName(in: model.language)).tag(RiskLevel?.some(risk))
+                    }
+                }
+                .frame(width: 150)
+            }
+
+            HStack(spacing: 12) {
+                Picker(copy.sortLabel, selection: $model.sortOption) {
+                    ForEach(ScanSortOption.allCases) { option in
+                        Text(option.title(in: model.language)).tag(option)
+                    }
+                }
+                .frame(width: 180)
+
+                Menu(copy.selectionActionsTitle) {
+                    Button(copy.selectAllVisibleAction) { model.selectAllVisibleResults() }
+                    Button(copy.clearSelectionAction) { model.clearResultSelection() }
+                    Divider()
+                    Button(copy.selectSafeAction) { model.selectVisibleResults(for: .safe) }
+                    Button(copy.selectReviewAction) { model.selectVisibleResults(for: .review) }
+                    Button(copy.selectDangerAction) { model.selectVisibleResults(for: .danger) }
+                    Divider()
+                    Button(copy.selectLargeItemsAction) { model.selectVisibleResults(minimumBytes: 1_073_741_824) }
+                    Menu(copy.categoryFilterLabel) {
+                        ForEach(CleanupCategory.allCases, id: \.self) { category in
+                            Button(category.localizedDisplayName(in: model.language)) {
+                                model.selectVisibleResults(for: category)
+                            }
                         }
                     }
+                }
+
+                Spacer()
+
+                if model.currentOperation == .scanning {
+                    ProgressView(copy.progressTitle(for: model.currentOperation))
+                        .controlSize(.small)
                 }
             }
         }
@@ -551,16 +731,31 @@ struct ResultsScreen: View {
 
     private var emptyResults: some View {
         VStack(spacing: 18) {
-            RoomServiceMark()
+            DevMaidMark()
                 .frame(width: 82, height: 82)
 
             Text(model.scanSummary == nil ? copy.emptyResultsBeforeScan : copy.emptyResultsFiltered)
                 .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(RoomServicePalette.ink)
+                .foregroundStyle(DevMaidPalette.ink)
 
             Text(copy.emptyResultsDetail)
                 .font(.system(size: 13))
-                .foregroundStyle(RoomServicePalette.muted)
+                .foregroundStyle(DevMaidPalette.muted)
+
+            HStack(spacing: 10) {
+                Button(copy.toolbarRunScan) {
+                    model.runScan()
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(!model.canScan)
+
+                Button(copy.emptyResultsSettingsHint) {
+                    withAnimation(.spring(response: 0.42, dampingFraction: 0.86)) {
+                        model.destination = .settings
+                    }
+                }
+                .buttonStyle(.bordered)
+            }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(40)
@@ -572,87 +767,105 @@ struct ResultsScreen: View {
                 Text(copy.inspectorTitle)
                     .font(.system(size: 18, weight: .bold, design: .rounded))
 
-                if let item = model.primarySelectedItem {
-                    detailCard(for: item)
-                } else if !model.selectedScanItems.isEmpty {
-                    batchDetailCard
-                } else {
-                    Text(copy.inspectorEmpty)
-                        .font(.system(size: 13))
-                        .foregroundStyle(RoomServicePalette.muted)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(18)
-                        .background(
-                            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                .fill(.thinMaterial)
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                                        .stroke(Color.white.opacity(0.34), lineWidth: 1)
+                Group {
+                    if let item = model.primarySelectedItem {
+                        detailCard(for: item)
+                    } else if !model.selectedScanItems.isEmpty {
+                        batchDetailCard
+                    } else {
+                        DetailSectionCard(
+                            title: copy.noSelectionYetTitle,
+                            detail: copy.inspectorEmpty
+                        ) {
+                            HStack(spacing: 10) {
+                                InfoChip(
+                                    title: copy.selectedLabel,
+                                    value: "0",
+                                    symbolName: "checkmark.circle.fill"
                                 )
-                        )
+                                InfoChip(
+                                    title: copy.visibleItemsLabel,
+                                    value: "\(model.filteredItems.count)",
+                                    symbolName: "shippingbox.fill"
+                                )
+                            }
+                        }
+                    }
                 }
+                .id(inspectorStateID)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .opacity
+                ))
 
                 Spacer()
             }
         }
     }
 
+    private var selectionRiskDetail: String {
+        let risks = Set(model.selectedScanItems.map(\.risk))
+        return risks.count > 1 ? copy.mixedRiskSelectionDetail : copy.uniformRiskSelectionDetail
+    }
+
     private func detailCard(for item: ScanItem) -> some View {
         VStack(alignment: .leading, spacing: 14) {
-            Label(item.category.displayName, systemImage: item.category.symbolName)
-                .font(.system(size: 15, weight: .bold))
+            DetailSectionCard(title: copy.selectedPathTitle) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(alignment: .top, spacing: 10) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(itemDisplayName(for: item))
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .foregroundStyle(DevMaidPalette.ink)
+                                .lineLimit(2)
 
-            RiskBadge(risk: item.risk, language: model.language)
-            Text(RoomServiceFormatters.byteString(item.bytes))
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+                            Label(item.category.localizedDisplayName(in: model.language), systemImage: item.category.symbolName)
+                                .font(.system(size: 13, weight: .semibold))
+                                .foregroundStyle(DevMaidPalette.muted)
+                        }
 
-            Group {
-                Text(copy.pathTitle)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(RoomServicePalette.muted)
-                Text(item.path)
-                    .font(.system(size: 12))
-                    .textSelection(.enabled)
-            }
+                        Spacer()
 
-            Group {
-                Text(copy.cleanupNoteTitle)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(RoomServicePalette.muted)
-                Text(item.category.localizedNote(in: model.language))
-                    .font(.system(size: 13))
-                    .foregroundStyle(RoomServicePalette.ink)
-            }
+                        RiskBadge(risk: item.risk, language: model.language)
+                    }
 
-            Group {
-                Text(copy.riskGuidanceTitle)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(RoomServicePalette.muted)
-                Text(item.risk.localizedDetail(in: model.language))
-                    .font(.system(size: 13))
-                    .foregroundStyle(RoomServicePalette.muted)
-            }
+                    HStack(spacing: 10) {
+                        InfoChip(
+                            title: copy.bytesMetricTitle,
+                            value: DevMaidFormatters.byteString(item.bytes),
+                            symbolName: "internaldrive.fill"
+                        )
 
-            if let groupName = item.groupName {
-                Group {
-                    Text(copy.groupTitle)
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundStyle(RoomServicePalette.muted)
-                    Text(groupName)
-                        .font(.system(size: 13))
-                        .foregroundStyle(RoomServicePalette.ink)
+                        if let groupName = item.groupName, !groupName.isEmpty {
+                            InfoChip(
+                                title: copy.groupTitle,
+                                value: groupName,
+                                symbolName: "square.stack.3d.up.fill"
+                            )
+                        }
+                    }
                 }
             }
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(copy.quickActionsTitle)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundStyle(RoomServicePalette.muted)
-                HStack {
+            DetailSectionCard(title: copy.pathTitle, detail: item.path) {
+                Text(parentDirectoryPath(for: item))
+                    .font(.system(size: 11, weight: .medium, design: .monospaced))
+                    .foregroundStyle(DevMaidPalette.muted)
+                    .textSelection(.enabled)
+                    .lineLimit(2)
+            }
+
+            DetailSectionCard(title: copy.cleanupNoteTitle, detail: item.category.localizedNote(in: model.language)) {
+                EmptyView()
+            }
+
+            DetailSectionCard(title: copy.riskGuidanceTitle, detail: item.risk.localizedDetail(in: model.language)) {
+                HStack(spacing: 10) {
                     Button(copy.showInFinderAction) {
                         model.revealPrimaryItemInFinder()
                     }
                     .buttonStyle(.bordered)
+
                     Button(copy.openInTerminalAction) {
                         model.openPrimaryItemInTerminal()
                     }
@@ -660,177 +873,314 @@ struct ResultsScreen: View {
                 }
             }
         }
-        .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.thinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color.white.opacity(0.34), lineWidth: 1)
-                )
-        )
     }
 
     private var batchDetailCard: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(copy.batchCleanupTitle)
-                .font(.system(size: 15, weight: .bold))
-            Text(copy.selectedItemsTitle(count: model.selectedScanItems.count))
-                .font(.system(size: 22, weight: .bold, design: .rounded))
-            Text(RoomServiceFormatters.byteString(model.selectedScanItems.reduce(0) { $0 + $1.bytes }))
-                .font(.system(size: 14, weight: .semibold))
-            Text(copy.batchCleanupDetail)
-                .font(.system(size: 13))
-                .foregroundStyle(RoomServicePalette.muted)
-        }
-        .padding(18)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.thinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color.white.opacity(0.34), lineWidth: 1)
-                )
-        )
-    }
-}
-
-struct HistoryScreen: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
-    private var copy: RoomServiceCopy { model.copy }
-
-    var body: some View {
-        HStack(spacing: 18) {
-            SurfaceCard(padding: 0) {
-                List(selection: Binding(
-                    get: { model.selectedHistoryID },
-                    set: { model.selectHistory(id: $0) }
-                )) {
-                    ForEach(model.historyEntries) { entry in
-                        VStack(alignment: .leading, spacing: 4) {
-                            HStack {
-                                Label(entry.displayName, systemImage: entry.kind == .delete ? "archivebox.fill" : "arrow.uturn.backward.circle.fill")
-                                    .font(.system(size: 13, weight: .semibold))
-                                Spacer()
-                                Text(RoomServiceFormatters.byteString(entry.totalBytes))
-                                    .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                    .foregroundStyle(RoomServicePalette.muted)
-                            }
-                            Text(entry.summary)
-                                .font(.system(size: 12))
-                            Text(RoomServiceFormatters.dateTimeString(entry.createdAt))
-                                .font(.system(size: 11))
-                                .foregroundStyle(RoomServicePalette.muted)
-                        }
-                        .padding(.vertical, 6)
-                        .tag(Optional(entry.id))
-                    }
-                }
-                .scrollContentBackground(.hidden)
-            }
-            .frame(minWidth: 320)
-
-            VStack(alignment: .leading, spacing: 16) {
-                if let entry = model.selectedHistoryEntry {
-                    SurfaceCard {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(entry.displayName)
-                                    .font(.system(size: 24, weight: .bold, design: .rounded))
-                                Text(entry.summary)
-                                    .font(.system(size: 14))
-                                    .foregroundStyle(RoomServicePalette.muted)
-                            }
-                            Spacer()
-                            if entry.kind == .delete {
-                                Button(copy.restoreAction) {
-                                    model.restoreSelectedHistory()
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .disabled(!model.canRestoreSelectedHistory)
-                            }
-                            Button(copy.exportHistoryAction) {
-                                model.exportHistory()
-                            }
-                            .buttonStyle(.bordered)
-                        }
-                    }
-
-                    HStack(spacing: 16) {
-                        MetricCard(
-                            title: copy.itemsMetricTitle,
-                            value: "\(entry.itemCount)",
-                            detail: copy.itemsMetricDetail,
-                            symbolName: "shippingbox.fill"
+            DetailSectionCard(title: copy.selectionImpactTitle, detail: copy.batchCleanupDetail) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack(spacing: 10) {
+                        InfoChip(
+                            title: copy.selectedLabel,
+                            value: "\(model.selectedScanItems.count)",
+                            symbolName: "checkmark.circle.fill"
                         )
-                        MetricCard(
+                        InfoChip(
                             title: copy.bytesMetricTitle,
-                            value: RoomServiceFormatters.byteString(entry.totalBytes),
-                            detail: copy.bytesMetricDetail,
+                            value: DevMaidFormatters.byteString(model.selectedScanItems.reduce(0) { $0 + $1.bytes }),
                             symbolName: "internaldrive.fill"
                         )
                     }
 
-                    if let manifest = model.selectedHistoryManifest {
-                        SurfaceCard {
-                            VStack(alignment: .leading, spacing: 12) {
-                                Text(copy.manifestItemsTitle)
-                                    .font(.system(size: 16, weight: .bold))
-                                List(manifest.items) { item in
-                                    VStack(alignment: .leading, spacing: 5) {
-                                        HStack {
-                                            Text(item.category.displayName)
-                                                .font(.system(size: 13, weight: .semibold))
-                                            Spacer()
-                                            RiskBadge(risk: item.risk, language: model.language)
-                                        }
-                                        Text(item.originalPath)
-                                            .font(.system(size: 12))
-                                            .foregroundStyle(RoomServicePalette.muted)
-                                            .textSelection(.enabled)
-                                    }
-                                    .padding(.vertical, 4)
-                                }
-                                .frame(maxHeight: .infinity)
-                                .scrollContentBackground(.hidden)
-                            }
+                    Text(copy.selectedItemsTitle(count: model.selectedScanItems.count))
+                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .foregroundStyle(DevMaidPalette.ink)
+                }
+            }
+
+            DetailSectionCard(title: copy.riskMixTitle, detail: selectionRiskDetail) {
+                HStack(spacing: 8) {
+                    ForEach(RiskLevel.allCases, id: \.self) { risk in
+                        let count = model.selectedScanItems.filter { $0.risk == risk }.count
+                        if count > 0 {
+                            InfoChip(
+                                title: risk.localizedDisplayName(in: model.language),
+                                value: "\(count)",
+                                symbolName: risk.symbolName
+                            )
                         }
-                    } else {
-                        SurfaceCard {
-                            VStack(alignment: .leading, spacing: 8) {
-                                Text(copy.noManifestPreview)
-                                    .font(.system(size: 12))
-                                    .foregroundStyle(RoomServicePalette.muted)
-                                if let sourceActionID = entry.sourceActionID {
-                                    Text("\(copy.sourceActionPrefix) \(sourceActionID)")
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(RoomServicePalette.muted)
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    SurfaceCard {
-                        Text(copy.historyEmpty)
-                            .font(.system(size: 14))
-                            .foregroundStyle(RoomServicePalette.muted)
                     }
                 }
             }
+
+            DetailSectionCard(title: copy.topCategoriesTitle) {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(topSelectedCategories, id: \.title) { category in
+                        HStack(spacing: 10) {
+                            Label(category.title, systemImage: category.symbolName)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(DevMaidPalette.ink)
+                            Spacer()
+                            Text(category.countLabel)
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                .foregroundStyle(DevMaidPalette.muted)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private func itemDisplayName(for item: ScanItem) -> String {
+        let url = URL(fileURLWithPath: item.path)
+        let candidate = url.lastPathComponent
+        return candidate.isEmpty ? item.path : candidate
+    }
+
+    private func parentDirectoryPath(for item: ScanItem) -> String {
+        let url = URL(fileURLWithPath: item.path)
+        let parent = url.deletingLastPathComponent().path
+        return parent.isEmpty ? item.path : parent
+    }
+
+    private var inspectorStateID: String {
+        if let item = model.primarySelectedItem {
+            return "single-\(item.id.uuidString)"
+        }
+        if !model.selectedScanItems.isEmpty {
+            return "batch-\(model.selectedScanItems.count)-\(model.selectedScanItems.reduce(0) { $0 + $1.bytes })"
+        }
+        return "empty-\(model.filteredItems.count)"
+    }
+
+    private var topSelectedCategories: [(title: String, symbolName: String, countLabel: String, count: Int)] {
+        let grouped = Dictionary(grouping: model.selectedScanItems, by: \.category)
+        return grouped
+            .map { category, items in
+                (
+                    title: category.localizedDisplayName(in: model.language),
+                    symbolName: category.symbolName,
+                    countLabel: copy.itemsCountLabel(items.count),
+                    count: items.count
+                )
+            }
+            .sorted { lhs, rhs in
+                if lhs.count == rhs.count {
+                    return lhs.title.localizedStandardCompare(rhs.title) == .orderedAscending
+                }
+                return lhs.count > rhs.count
+            }
+            .prefix(3)
+            .map { $0 }
+    }
+}
+
+struct HistoryScreen: View {
+    @EnvironmentObject private var model: DevMaidAppModel
+    private var copy: DevMaidCopy { model.copy }
+
+    var body: some View {
+        HStack(spacing: 18) {
+            SurfaceCard(padding: 0) {
+                VStack(alignment: .leading, spacing: 0) {
+                    SectionTitleRow(
+                        title: copy.historyTimelineTitle,
+                        detail: copy.historyTimelineDetail
+                    )
+                    .padding(18)
+
+                    List(selection: Binding(
+                        get: { model.selectedHistoryID },
+                        set: { model.selectHistory(id: $0) }
+                    )) {
+                        ForEach(model.historyEntries) { entry in
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(alignment: .top) {
+                                    ActionKindBadge(kind: entry.kind, language: model.language)
+                                    Spacer()
+                                    Text(DevMaidFormatters.byteString(entry.totalBytes))
+                                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                }
+                                Text(entry.summary)
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundStyle(DevMaidPalette.ink)
+                                    .lineLimit(2)
+                                HStack {
+                                    Text(DevMaidFormatters.dateTimeString(entry.createdAt))
+                                        .font(.system(size: 11))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                    Spacer()
+                                    Text("\(entry.itemCount)")
+                                        .font(.system(size: 11, weight: .bold, design: .rounded))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                }
+                            }
+                            .padding(.vertical, 8)
+                            .tag(Optional(entry.id))
+                        }
+                    }
+                    .scrollContentBackground(.hidden)
+                }
+            }
+            .frame(minWidth: 320)
+
+            VStack(alignment: .leading, spacing: 16) {
+                Group {
+                    if let entry = model.selectedHistoryEntry {
+                        SurfaceCard {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    ActionKindBadge(kind: entry.kind, language: model.language)
+                                    Text(entry.kind.localizedDisplayName(in: model.language))
+                                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                                    Text(entry.summary)
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                }
+                                Spacer(minLength: 24)
+                                VStack(alignment: .trailing, spacing: 10) {
+                                    if entry.kind == .delete {
+                                        Button(copy.restoreAction) {
+                                            model.restoreSelectedHistory()
+                                        }
+                                        .buttonStyle(.borderedProminent)
+                                        .disabled(!model.canRestoreSelectedHistory)
+                                    }
+                                    Button(copy.exportHistoryAction) {
+                                        model.exportHistory()
+                                    }
+                                    .buttonStyle(.bordered)
+                                }
+                            }
+                        }
+
+                        HStack(spacing: 16) {
+                            MetricCard(
+                                title: copy.itemsMetricTitle,
+                                value: "\(entry.itemCount)",
+                                detail: copy.itemsMetricDetail,
+                                symbolName: "shippingbox.fill"
+                            )
+                            MetricCard(
+                                title: copy.bytesMetricTitle,
+                                value: DevMaidFormatters.byteString(entry.totalBytes),
+                                detail: copy.bytesMetricDetail,
+                                symbolName: "internaldrive.fill"
+                            )
+                        }
+
+                        if let manifest = model.selectedHistoryManifest {
+                            SurfaceCard {
+                                VStack(alignment: .leading, spacing: 12) {
+                                    SectionTitleRow(
+                                        title: copy.manifestItemsTitle,
+                                        detail: copy.manifestItemsDetail
+                                    )
+                                    ScrollView {
+                                        LazyVStack(alignment: .leading, spacing: 10) {
+                                            ForEach(manifest.items) { item in
+                                                DetailSectionCard(
+                                                    title: item.category.localizedDisplayName(in: model.language),
+                                                    detail: item.note
+                                                ) {
+                                                    VStack(alignment: .leading, spacing: 10) {
+                                                        HStack {
+                                                            RiskBadge(risk: item.risk, language: model.language)
+                                                            Spacer()
+                                                            Text(DevMaidFormatters.byteString(item.bytes))
+                                                                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                                                .foregroundStyle(DevMaidPalette.muted)
+                                                        }
+                                                        Text(item.originalPath)
+                                                            .font(.system(size: 12))
+                                                            .foregroundStyle(DevMaidPalette.ink)
+                                                            .textSelection(.enabled)
+                                                            .lineLimit(2)
+                                                            .truncationMode(.middle)
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                    .frame(maxHeight: .infinity)
+                                }
+                            }
+                        } else {
+                            SurfaceCard {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(copy.noManifestPreview)
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                    if let sourceActionID = entry.sourceActionID {
+                                        Text("\(copy.sourceActionPrefix) \(sourceActionID)")
+                                            .font(.system(size: 12))
+                                            .foregroundStyle(DevMaidPalette.muted)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        SurfaceCard {
+                            Text(copy.historyEmpty)
+                                .font(.system(size: 14))
+                                .foregroundStyle(DevMaidPalette.muted)
+                        }
+                    }
+                }
+                .id(historyDetailID)
+                .transition(.asymmetric(
+                    insertion: .move(edge: .trailing).combined(with: .opacity),
+                    removal: .opacity
+                ))
+            }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
         }
+        .animation(.spring(response: 0.34, dampingFraction: 0.84), value: model.selectedHistoryID)
+    }
+
+    private var historyDetailID: String {
+        model.selectedHistoryID ?? "history-empty"
     }
 }
 
 struct SettingsScreen: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
-    private var copy: RoomServiceCopy { model.copy }
+    @EnvironmentObject private var model: DevMaidAppModel
+    private var copy: DevMaidCopy { model.copy }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text(copy.settingsTitle)
-                    .font(.system(size: 28, weight: .bold, design: .rounded))
+                HeroPanel {
+                    HStack(alignment: .top, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text(copy.settingsHeroBadge)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(DevMaidPalette.review.opacity(0.12), in: Capsule())
+                                .foregroundStyle(DevMaidPalette.review)
+
+                            Text(copy.settingsTitle)
+                                .font(.system(size: 30, weight: .bold, design: .rounded))
+                                .foregroundStyle(DevMaidPalette.ink)
+
+                            Text(copy.settingsHeroDetail)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(DevMaidPalette.muted)
+                                .frame(maxWidth: 640, alignment: .leading)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            InfoChip(title: copy.scanRootsLabel, value: "\(model.searchRoots.count)", symbolName: "folder.fill")
+                            InfoChip(title: copy.exclusionsLabel, value: "\(model.excludedPaths.count)", symbolName: "eye.slash.fill")
+                            InfoChip(title: copy.languageTitle, value: model.language.displayName, symbolName: "character.bubble.fill")
+                        }
+                    }
+                }
 
                 SurfaceCard {
                     VStack(alignment: .leading, spacing: 12) {
@@ -838,7 +1188,7 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.updatesDetail)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
 
                         UpdateStatusCard(showAutoCheckToggle: true)
                     }
@@ -850,7 +1200,7 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.languageDetail)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
 
                         Picker(copy.languageTitle, selection: Binding(
                             get: { model.language },
@@ -870,12 +1220,12 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.exclusionsDescription)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
 
                         if model.excludedPaths.isEmpty {
                             Text(copy.noExclusions)
                                 .font(.system(size: 13))
-                                .foregroundStyle(RoomServicePalette.muted)
+                                .foregroundStyle(DevMaidPalette.muted)
                                 .padding(.vertical, 4)
                         } else {
                             List(selection: $model.selectedExcludedPath) {
@@ -904,7 +1254,7 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.notificationsDetail)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
 
                         Toggle(copy.notificationsEnabledTitle, isOn: Binding(
                             get: { model.notificationsEnabled },
@@ -939,7 +1289,7 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.scanRootsDescription)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
 
                         List(selection: $model.selectedSearchRoot) {
                             ForEach(model.searchRoots, id: \.self) { root in
@@ -976,7 +1326,7 @@ struct SettingsScreen: View {
 
                         Text(copy.safetyDefaultsDetail)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
                     }
                 }
 
@@ -986,11 +1336,11 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.fullDiskAccessDescription)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
 
                         Text(copy.fullDiskAccessSteps)
                             .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(RoomServicePalette.ink)
+                            .foregroundStyle(DevMaidPalette.ink)
 
                         HStack {
                             Button(copy.onboardingPrimaryAction) {
@@ -1011,7 +1361,7 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.privacyPolicyDetail)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
                         Button(copy.openPrivacyPolicyAction) {
                             model.openPrivacyPolicy()
                         }
@@ -1027,7 +1377,7 @@ struct SettingsScreen: View {
                                     .font(.system(size: 18, weight: .bold))
                                 Text(copy.startupItemsDetail)
                                     .font(.system(size: 13))
-                                    .foregroundStyle(RoomServicePalette.muted)
+                                    .foregroundStyle(DevMaidPalette.muted)
                             }
                             Spacer()
                             if model.isLoadingStartupItems {
@@ -1052,7 +1402,7 @@ struct SettingsScreen: View {
                         if model.filteredStartupItems.isEmpty {
                             Text(copy.startupNoItems)
                                 .font(.system(size: 13))
-                                .foregroundStyle(RoomServicePalette.muted)
+                                .foregroundStyle(DevMaidPalette.muted)
                         } else {
                             VStack(spacing: 10) {
                                 ForEach(model.filteredStartupItems) { item in
@@ -1063,12 +1413,12 @@ struct SettingsScreen: View {
                                                     .font(.system(size: 13, weight: .semibold))
                                                 StartupKindBadge(
                                                     title: item.kind == .appManaged ? copy.startupManagedBadge : copy.startupReadOnlyBadge,
-                                                    tint: item.kind == .appManaged ? RoomServicePalette.accent : RoomServicePalette.muted
+                                                    tint: item.kind == .appManaged ? DevMaidPalette.accent : DevMaidPalette.muted
                                                 )
                                             }
                                             Text(item.detail)
                                                 .font(.system(size: 12))
-                                                .foregroundStyle(RoomServicePalette.muted)
+                                                .foregroundStyle(DevMaidPalette.muted)
                                         }
                                         Spacer()
                                         Toggle(
@@ -1097,16 +1447,16 @@ struct SettingsScreen: View {
                             .font(.system(size: 18, weight: .bold))
 
                         HStack(spacing: 12) {
-                            Link(copy.website, destination: RoomServiceLinks.website)
-                            Link(copy.support, destination: RoomServiceLinks.support)
-                            Link(copy.sponsor, destination: RoomServiceLinks.sponsor)
-                            Link(copy.security, destination: RoomServiceLinks.securityEmail)
+                            Link(copy.website, destination: DevMaidLinks.website)
+                            Link(copy.support, destination: DevMaidLinks.support)
+                            Link(copy.sponsor, destination: DevMaidLinks.sponsor)
+                            Link(copy.security, destination: DevMaidLinks.securityEmail)
                         }
                         .font(.system(size: 13, weight: .semibold))
 
                         Text(copy.supportDeveloperDetail)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
                     }
                 }
             }
@@ -1116,35 +1466,46 @@ struct SettingsScreen: View {
 }
 
 struct OnboardingSheet: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
+    @EnvironmentObject private var model: DevMaidAppModel
 
-    private var copy: RoomServiceCopy { model.copy }
+    private var copy: DevMaidCopy { model.copy }
 
     var body: some View {
         ZStack {
-            RoomServiceBackground()
+            DevMaidBackground()
 
             VStack(alignment: .leading, spacing: 22) {
                 HeroPanel {
-                    VStack(alignment: .leading, spacing: 18) {
-                        HStack(spacing: 16) {
-                            RoomServiceMark()
-                                .frame(width: 76, height: 76)
+                    HStack(alignment: .center, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 18) {
+                            HStack(spacing: 16) {
+                                DevMaidMark()
+                                    .frame(width: 76, height: 76)
 
-                            VStack(alignment: .leading, spacing: 6) {
-                                Text(copy.onboardingTitle)
-                                    .font(.system(size: 30, weight: .bold, design: .rounded))
-                                Text(copy.onboardingDetail)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundStyle(RoomServicePalette.muted)
+                                VStack(alignment: .leading, spacing: 6) {
+                                    Text(copy.onboardingTitle)
+                                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                                    Text(copy.onboardingDetail)
+                                        .font(.system(size: 14, weight: .medium))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                }
+                            }
+
+                            HStack(spacing: 12) {
+                                InfoChip(title: copy.scanRootsLabel, value: "\(model.searchRoots.count)", symbolName: "folder.fill")
+                                InfoChip(title: copy.exclusionsLabel, value: "\(model.excludedPaths.count)", symbolName: "eye.slash.fill")
+                                InfoChip(title: copy.selectedCategoriesLabel, value: "\(model.includedCategories.count)", symbolName: "square.grid.2x2.fill")
                             }
                         }
 
-                        HStack(spacing: 12) {
-                            InfoChip(title: copy.scanRootsLabel, value: "\(model.searchRoots.count)", symbolName: "folder.fill")
-                            InfoChip(title: copy.exclusionsLabel, value: "\(model.excludedPaths.count)", symbolName: "eye.slash.fill")
-                            InfoChip(title: copy.selectedCategoriesLabel, value: "\(model.includedCategories.count)", symbolName: "square.grid.2x2.fill")
+                        Spacer()
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            FeatureBullet(text: copy.heroFeaturePreview, symbolName: "eye.fill")
+                            FeatureBullet(text: copy.heroFeatureSharedEngine, symbolName: "terminal.fill")
+                            FeatureBullet(text: copy.heroFeatureRestore, symbolName: "arrow.uturn.backward.circle.fill")
                         }
+                        .frame(maxWidth: 280, alignment: .leading)
                     }
                 }
 
@@ -1153,20 +1514,37 @@ struct OnboardingSheet: View {
                         title: copy.onboardingStepOneTitle,
                         detail: copy.onboardingStepOneDetail,
                         symbol: "lock.shield.fill",
-                        tint: RoomServicePalette.accent
+                        tint: DevMaidPalette.accent
                     )
                     onboardingStep(
                         title: copy.onboardingStepTwoTitle,
                         detail: copy.onboardingStepTwoDetail,
                         symbol: "slider.horizontal.3",
-                        tint: RoomServicePalette.review
+                        tint: DevMaidPalette.review
                     )
                     onboardingStep(
                         title: copy.onboardingStepThreeTitle,
                         detail: copy.onboardingStepThreeDetail,
                         symbol: "clock.arrow.circlepath",
-                        tint: RoomServicePalette.safe
+                        tint: DevMaidPalette.safe
                     )
+                }
+
+                SurfaceCard {
+                    VStack(alignment: .leading, spacing: 12) {
+                        Text(copy.onboardingChecklistTitle)
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundStyle(DevMaidPalette.ink)
+                        Text(copy.onboardingChecklistDetail)
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundStyle(DevMaidPalette.muted)
+
+                        HStack(spacing: 12) {
+                            InfoChip(title: copy.scanRootsLabel, value: "\(model.searchRoots.count)", symbolName: "folder.fill.badge.plus")
+                            InfoChip(title: copy.exclusionsLabel, value: "\(model.excludedPaths.count)", symbolName: "eye.slash.fill")
+                            InfoChip(title: copy.selectedCategoriesLabel, value: "\(model.includedCategories.count)", symbolName: "square.grid.2x2.fill")
+                        }
+                    }
                 }
 
                 SurfaceCard {
@@ -1175,7 +1553,7 @@ struct OnboardingSheet: View {
                             .font(.system(size: 16, weight: .bold))
                         Text(copy.fullDiskAccessSteps)
                             .font(.system(size: 13, weight: .medium))
-                            .foregroundStyle(RoomServicePalette.ink)
+                            .foregroundStyle(DevMaidPalette.ink)
                     }
                 }
 
@@ -1211,10 +1589,10 @@ struct OnboardingSheet: View {
                     .foregroundStyle(tint)
                 Text(title)
                     .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundStyle(RoomServicePalette.ink)
+                    .foregroundStyle(DevMaidPalette.ink)
                 Text(detail)
                     .font(.system(size: 13))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
         }
@@ -1223,7 +1601,7 @@ struct OnboardingSheet: View {
 }
 
 struct AboutScreen: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
+    @EnvironmentObject private var model: DevMaidAppModel
 
     private var appVersion: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.0"
@@ -1231,16 +1609,42 @@ struct AboutScreen: View {
         return "\(version) (\(build))"
     }
 
-    private var copy: RoomServiceCopy { model.copy }
+    private var copy: DevMaidCopy { model.copy }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 22) {
-                WordmarkLockup(subtitle: copy.tagline)
+                HeroPanel {
+                    HStack(alignment: .top, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text(copy.aboutHeroBadge)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(DevMaidPalette.accent.opacity(0.12), in: Capsule())
+                                .foregroundStyle(DevMaidPalette.accent)
+
+                            WordmarkLockup(subtitle: copy.tagline)
+
+                            Text(copy.aboutHeroDetail)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(DevMaidPalette.muted)
+                                .frame(maxWidth: 720, alignment: .leading)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            InfoChip(title: copy.versionTitle, value: appVersion, symbolName: "macwindow.on.rectangle")
+                            InfoChip(title: copy.cliTitle, value: "devmaid", symbolName: "terminal.fill")
+                            InfoChip(title: copy.updatesTitle, value: copy.updateBadgeTitle(for: model.updateState), symbolName: "sparkles")
+                        }
+                    }
+                }
 
                 Text(copy.aboutDescription)
                     .font(.system(size: 15, weight: .medium))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
                     .frame(maxWidth: 760, alignment: .leading)
 
                 HStack(spacing: 16) {
@@ -1272,10 +1676,10 @@ struct AboutScreen: View {
                         Text(copy.linksTitle)
                             .font(.system(size: 18, weight: .bold))
                         HStack(spacing: 12) {
-                            Link(copy.website, destination: RoomServiceLinks.website)
-                            Link(copy.repository, destination: RoomServiceLinks.repository)
-                            Link(copy.support, destination: RoomServiceLinks.support)
-                            Link(copy.sponsor, destination: RoomServiceLinks.sponsor)
+                            Link(copy.website, destination: DevMaidLinks.website)
+                            Link(copy.repository, destination: DevMaidLinks.repository)
+                            Link(copy.support, destination: DevMaidLinks.support)
+                            Link(copy.sponsor, destination: DevMaidLinks.sponsor)
                         }
                         .font(.system(size: 13, weight: .semibold))
                     }
@@ -1287,7 +1691,7 @@ struct AboutScreen: View {
                             .font(.system(size: 18, weight: .bold))
                         Text(copy.acknowledgementsDetail)
                             .font(.system(size: 13))
-                            .foregroundStyle(RoomServicePalette.muted)
+                            .foregroundStyle(DevMaidPalette.muted)
                     }
                 }
             }
@@ -1297,26 +1701,26 @@ struct AboutScreen: View {
 }
 
 struct UpdateStatusCard: View {
-    @EnvironmentObject private var model: RoomServiceAppModel
+    @EnvironmentObject private var model: DevMaidAppModel
 
     let showAutoCheckToggle: Bool
 
-    private var copy: RoomServiceCopy { model.copy }
+    private var copy: DevMaidCopy { model.copy }
 
     private var tint: Color {
         switch model.updateState {
         case .idle:
-            return RoomServicePalette.accent
+            return DevMaidPalette.accent
         case .checking:
-            return RoomServicePalette.accent
+            return DevMaidPalette.accent
         case .upToDate:
-            return RoomServicePalette.safe
+            return DevMaidPalette.safe
         case .available:
-            return RoomServicePalette.accent
+            return DevMaidPalette.accent
         case .unsupported:
-            return RoomServicePalette.review
+            return DevMaidPalette.review
         case .failed:
-            return RoomServicePalette.danger
+            return DevMaidPalette.danger
         }
     }
 
@@ -1327,7 +1731,7 @@ struct UpdateStatusCard: View {
                     UpdateBadge(title: copy.updateBadgeTitle(for: model.updateState), tint: tint)
                     Text(copy.updateStatusText(for: model.updateState))
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(RoomServicePalette.ink)
+                        .foregroundStyle(DevMaidPalette.ink)
                 }
                 Spacer()
 
@@ -1348,12 +1752,12 @@ struct UpdateStatusCard: View {
             if let summary = model.updateSummary, !summary.isEmpty {
                 Text(summary)
                     .font(.system(size: 13))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
             }
 
             VStack(alignment: .leading, spacing: 8) {
                 if let checkedAt = model.lastUpdateCheckDate {
-                    metadataRow(title: copy.lastCheckedLabel, value: RoomServiceFormatters.dateTimeString(checkedAt))
+                    metadataRow(title: copy.lastCheckedLabel, value: DevMaidFormatters.dateTimeString(checkedAt))
                 }
 
                 if let feedURL = model.updateFeedURL {
@@ -1369,7 +1773,7 @@ struct UpdateStatusCard: View {
 
                 Text(copy.autoCheckUpdatesDetail)
                     .font(.system(size: 12))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
             }
 
             HStack(spacing: 10) {
@@ -1400,10 +1804,10 @@ struct UpdateStatusCard: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
                 .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(RoomServicePalette.muted)
+                .foregroundStyle(DevMaidPalette.muted)
             Text(value)
                 .font(.system(size: 12))
-                .foregroundStyle(RoomServicePalette.ink)
+                .foregroundStyle(DevMaidPalette.ink)
                 .textSelection(.enabled)
                 .lineLimit(2)
                 .truncationMode(.middle)
@@ -1437,7 +1841,7 @@ private struct TrendSparkline: View {
 
             ZStack(alignment: .bottomLeading) {
                 RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .fill(RoomServicePalette.accent.opacity(0.08))
+                    .fill(DevMaidPalette.accent.opacity(0.08))
 
                 Path { path in
                     for (index, value) in values.enumerated() {
@@ -1452,7 +1856,7 @@ private struct TrendSparkline: View {
                 }
                 .stroke(
                     LinearGradient(
-                        colors: [RoomServicePalette.accent, RoomServicePalette.safe],
+                        colors: [DevMaidPalette.accent, DevMaidPalette.safe],
                         startPoint: .leading,
                         endPoint: .trailing
                     ),
@@ -1465,5 +1869,5 @@ private struct TrendSparkline: View {
 
 private func signedByteString(_ value: Int64) -> String {
     let prefix = value > 0 ? "+" : value < 0 ? "-" : ""
-    return prefix + RoomServiceFormatters.byteString(abs(value))
+    return prefix + DevMaidFormatters.byteString(abs(value))
 }

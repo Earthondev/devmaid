@@ -25,7 +25,7 @@ ARCHIVE_BASENAME="devmaid-${VERSION}"
 APP_PRODUCT="DevMaidApp"
 APP_EXECUTABLE_NAME="DevMaid"
 APP_BUNDLE_NAME="DevMaid.app"
-APP_ICON_PATH="$ROOT_DIR/Sources/RoomServiceApp/Resources/AppIcon.icns"
+APP_ICON_PATH="$ROOT_DIR/Sources/DevMaidApp/Resources/AppIcon.icns"
 
 prune_bundle_xattrs() {
   local target="$1"

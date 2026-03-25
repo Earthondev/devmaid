@@ -5,11 +5,11 @@ import Foundation
 
 let fileManager = FileManager.default
 let projectRoot = URL(fileURLWithPath: fileManager.currentDirectoryPath)
-let resourcesURL = projectRoot.appendingPathComponent("Sources/RoomServiceApp/Resources", isDirectory: true)
+let resourcesURL = projectRoot.appendingPathComponent("Sources/DevMaidApp/Resources", isDirectory: true)
 let docsAssetsURL = projectRoot.appendingPathComponent("docs/assets", isDirectory: true)
 let iconsetURL = resourcesURL.appendingPathComponent("AppIcon.iconset", isDirectory: true)
 let iconURL = resourcesURL.appendingPathComponent("AppIcon.icns")
-let marketingPNGURL = docsAssetsURL.appendingPathComponent("roomservice-marketing.png")
+let marketingPNGURL = docsAssetsURL.appendingPathComponent("devmaid-marketing.png")
 
 try fileManager.createDirectory(at: resourcesURL, withIntermediateDirectories: true)
 try fileManager.createDirectory(at: docsAssetsURL, withIntermediateDirectories: true)

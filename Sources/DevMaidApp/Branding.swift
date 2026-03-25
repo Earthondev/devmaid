@@ -1,7 +1,7 @@
 import SwiftUI
-import RoomServiceKit
+import DevMaidKit
 
-enum RoomServicePalette {
+enum DevMaidPalette {
     static let accent = Color(red: 0.16, green: 0.52, blue: 0.82)
     static let accentSecondary = Color(red: 0.23, green: 0.80, blue: 0.77)
     static let accentTertiary = Color(red: 0.53, green: 0.72, blue: 0.96)
@@ -9,8 +9,9 @@ enum RoomServicePalette {
     static let mist = Color.white.opacity(0.42)
     static let card = Color.white.opacity(0.42)
     static let cardStrong = Color.white.opacity(0.58)
-    static let border = Color.white.opacity(0.42)
-    static let borderStrong = Color.black.opacity(0.08)
+    static let border = Color.white.opacity(0.58)
+    static let borderStrong = Color.black.opacity(0.12)
+    static let borderAccent = accent.opacity(0.14)
     static let sidebar = Color(red: 0.16, green: 0.24, blue: 0.34)
     static let sidebarSecondary = Color(red: 0.23, green: 0.34, blue: 0.45)
     static let ink = Color(red: 0.12, green: 0.16, blue: 0.22)
@@ -33,7 +34,7 @@ enum RoomServicePalette {
     }
 }
 
-struct RoomServiceBackground: View {
+struct DevMaidBackground: View {
     var body: some View {
         ZStack {
             LinearGradient(
@@ -55,19 +56,19 @@ struct RoomServiceBackground: View {
                 .blur(radius: 24)
 
             Circle()
-                .fill(RoomServicePalette.accent.opacity(0.18))
+                .fill(DevMaidPalette.accent.opacity(0.18))
                 .frame(width: 540, height: 540)
                 .offset(x: 420, y: -280)
                 .blur(radius: 34)
 
             Circle()
-                .fill(RoomServicePalette.accentSecondary.opacity(0.14))
+                .fill(DevMaidPalette.accentSecondary.opacity(0.14))
                 .frame(width: 420, height: 420)
                 .offset(x: -260, y: 320)
                 .blur(radius: 34)
 
             Circle()
-                .fill(RoomServicePalette.accentTertiary.opacity(0.12))
+                .fill(DevMaidPalette.accentTertiary.opacity(0.12))
                 .frame(width: 360, height: 360)
                 .offset(x: -420, y: -180)
                 .blur(radius: 28)
@@ -88,7 +89,7 @@ struct RoomServiceBackground: View {
     }
 }
 
-struct RoomServiceMark: View {
+struct DevMaidMark: View {
     @State private var isFloating = false
 
     var body: some View {
@@ -96,7 +97,7 @@ struct RoomServiceMark: View {
             RoundedRectangle(cornerRadius: 30, style: .continuous)
                 .fill(
                     LinearGradient(
-                        colors: [RoomServicePalette.accent, RoomServicePalette.accentSecondary],
+                        colors: [DevMaidPalette.accent, DevMaidPalette.accentSecondary],
                         startPoint: .topLeading,
                         endPoint: .bottomTrailing
                     )
@@ -136,10 +137,10 @@ struct RoomServiceMark: View {
         .aspectRatio(1, contentMode: .fit)
         .scaleEffect(isFloating ? 1.0 : 0.97)
         .offset(y: isFloating ? -3 : 3)
-        .shadow(color: RoomServicePalette.glow, radius: 22, y: 14)
+        .shadow(color: DevMaidPalette.glow, radius: 22, y: 14)
         .overlay(
             RoundedRectangle(cornerRadius: 30, style: .continuous)
-                .stroke(Color.white.opacity(0.35), lineWidth: 1)
+                .stroke(Color.white.opacity(0.52), lineWidth: 1.2)
         )
         .onAppear {
             withAnimation(.easeInOut(duration: 2.8).repeatForever(autoreverses: true)) {
@@ -158,16 +159,16 @@ struct WordmarkLockup: View {
 
     var body: some View {
         HStack(spacing: 16) {
-            RoomServiceMark()
+            DevMaidMark()
                 .frame(width: 56, height: 56)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("RoomService")
+                Text("DevMaid")
                     .font(.system(size: 30, weight: .black, design: .rounded))
-                    .foregroundStyle(RoomServicePalette.ink)
+                    .foregroundStyle(DevMaidPalette.ink)
                 Text(subtitle)
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
             }
         }
     }
@@ -182,8 +183,8 @@ struct RiskBadge: View {
             .font(.system(size: 12, weight: .semibold, design: .rounded))
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(RoomServicePalette.color(for: risk).opacity(0.14), in: Capsule())
-            .foregroundStyle(RoomServicePalette.color(for: risk))
+            .background(DevMaidPalette.color(for: risk).opacity(0.14), in: Capsule())
+            .foregroundStyle(DevMaidPalette.color(for: risk))
     }
 }
 
@@ -207,8 +208,8 @@ struct SurfaceCard<Content: View>: View {
                             .fill(
                                 LinearGradient(
                                     colors: [
-                                        RoomServicePalette.cardStrong,
-                                        RoomServicePalette.mist.opacity(0.18),
+                                        DevMaidPalette.cardStrong,
+                                        DevMaidPalette.mist.opacity(0.18),
                                     ],
                                     startPoint: .topLeading,
                                     endPoint: .bottomTrailing
@@ -217,12 +218,17 @@ struct SurfaceCard<Content: View>: View {
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
-                            .stroke(RoomServicePalette.border, lineWidth: 1)
+                            .stroke(DevMaidPalette.border, lineWidth: 1.1)
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 22, style: .continuous)
-                            .stroke(RoomServicePalette.borderStrong, lineWidth: 0.6)
+                            .stroke(DevMaidPalette.borderStrong, lineWidth: 0.7)
                             .blur(radius: 0.2)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .stroke(DevMaidPalette.borderAccent, lineWidth: 0.8)
+                            .padding(1)
                     )
                     .shadow(color: Color.white.opacity(0.34), radius: 1, y: 1)
                     .shadow(color: Color.black.opacity(0.08), radius: 28, y: 18)
@@ -258,9 +264,14 @@ struct HeroPanel<Content: View>: View {
                     )
                     .overlay(
                         RoundedRectangle(cornerRadius: 28, style: .continuous)
-                            .stroke(Color.white.opacity(0.44), lineWidth: 1)
+                            .stroke(DevMaidPalette.border, lineWidth: 1.2)
                     )
-                    .shadow(color: RoomServicePalette.glow, radius: 26, y: 18)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .stroke(DevMaidPalette.borderStrong.opacity(0.7), lineWidth: 0.7)
+                            .padding(1)
+                    )
+                    .shadow(color: DevMaidPalette.glow, radius: 26, y: 18)
             )
     }
 }
@@ -274,10 +285,10 @@ struct SectionTitleRow: View {
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
                     .font(.system(size: 21, weight: .bold, design: .rounded))
-                    .foregroundStyle(RoomServicePalette.ink)
+                    .foregroundStyle(DevMaidPalette.ink)
                 Text(detail)
                     .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
             }
             Spacer()
         }
@@ -294,16 +305,16 @@ struct InfoChip: View {
             Image(systemName: symbolName)
                 .font(.system(size: 12, weight: .bold))
                 .frame(width: 28, height: 28)
-                .background(RoomServicePalette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
-                .foregroundStyle(RoomServicePalette.accent)
+                .background(DevMaidPalette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                .foregroundStyle(DevMaidPalette.accent)
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(value)
                     .font(.system(size: 13, weight: .bold, design: .rounded))
-                    .foregroundStyle(RoomServicePalette.ink)
+                    .foregroundStyle(DevMaidPalette.ink)
                 Text(title)
                     .font(.system(size: 11, weight: .medium))
-                    .foregroundStyle(RoomServicePalette.muted)
+                    .foregroundStyle(DevMaidPalette.muted)
             }
         }
         .padding(.horizontal, 12)
@@ -311,8 +322,15 @@ struct InfoChip: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.white.opacity(0.44), lineWidth: 1)
+                .stroke(DevMaidPalette.border, lineWidth: 1.1)
         )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(DevMaidPalette.borderStrong.opacity(0.65), lineWidth: 0.65)
+                .padding(0.8)
+        )
+        .shadow(color: Color.white.opacity(0.18), radius: 1, y: 1)
+        .shadow(color: Color.black.opacity(0.04), radius: 10, y: 6)
     }
 }
 
@@ -325,12 +343,12 @@ struct FeatureBullet: View {
             Image(systemName: symbolName)
                 .font(.system(size: 11, weight: .bold))
                 .frame(width: 24, height: 24)
-                .background(RoomServicePalette.accent.opacity(0.12), in: Circle())
-                .foregroundStyle(RoomServicePalette.accent)
+                .background(DevMaidPalette.accent.opacity(0.12), in: Circle())
+                .foregroundStyle(DevMaidPalette.accent)
 
             Text(text)
                 .font(.system(size: 13, weight: .medium))
-                .foregroundStyle(RoomServicePalette.ink)
+                .foregroundStyle(DevMaidPalette.ink)
         }
     }
 }
@@ -348,27 +366,27 @@ struct CategoryPill: View {
                     Text(category.displayName.uppercased())
                         .font(.system(size: 10, weight: .bold, design: .rounded))
                         .tracking(0.8)
-                        .foregroundStyle(RoomServicePalette.muted)
+                        .foregroundStyle(DevMaidPalette.muted)
                     Label(category.localizedShortDescription(in: language), systemImage: category.symbolName)
                         .font(.system(size: 13, weight: .semibold, design: .rounded))
-                        .foregroundStyle(RoomServicePalette.ink)
+                        .foregroundStyle(DevMaidPalette.ink)
                 }
                 Spacer(minLength: 8)
                 Image(systemName: isEnabled ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(isEnabled ? RoomServicePalette.accent : RoomServicePalette.muted.opacity(0.7))
+                    .foregroundStyle(isEnabled ? DevMaidPalette.accent : DevMaidPalette.muted.opacity(0.7))
             }
 
             Text(category.localizedNote(in: language))
                 .font(.system(size: 12, weight: .medium))
-                .foregroundStyle(RoomServicePalette.muted)
+                .foregroundStyle(DevMaidPalette.muted)
                 .lineLimit(2)
 
             HStack {
                 RiskBadge(risk: category.risk, language: language)
                 Spacer()
-                Text(bytes > 0 ? RoomServiceFormatters.byteString(bytes) : (language == .thai ? "รวมไว้แล้ว" : "Included"))
+                Text(bytes > 0 ? DevMaidFormatters.byteString(bytes) : (language == .thai ? "รวมไว้แล้ว" : "Included"))
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundStyle(RoomServicePalette.ink)
+                    .foregroundStyle(DevMaidPalette.ink)
             }
         }
         .padding(16)
@@ -377,11 +395,16 @@ struct CategoryPill: View {
                 .fill(.thinMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(RoomServicePalette.card.opacity(0.42))
+                        .fill(DevMaidPalette.card.opacity(0.42))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(isEnabled ? RoomServicePalette.accent.opacity(0.26) : Color.white.opacity(0.34), lineWidth: 1)
+                        .stroke(isEnabled ? DevMaidPalette.accent.opacity(0.36) : DevMaidPalette.border, lineWidth: 1.1)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(DevMaidPalette.borderStrong.opacity(isEnabled ? 0.35 : 0.55), lineWidth: 0.65)
+                        .padding(0.8)
                 )
         )
     }
@@ -398,23 +421,23 @@ struct MetricCard: View {
             HStack {
                 Image(systemName: symbolName)
                     .font(.system(size: 15, weight: .bold))
-                    .foregroundStyle(RoomServicePalette.accent)
+                    .foregroundStyle(DevMaidPalette.accent)
                     .frame(width: 34, height: 34)
-                    .background(RoomServicePalette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .background(DevMaidPalette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                 Spacer()
             }
 
             Text(value)
                 .font(.system(size: 28, weight: .black, design: .rounded))
-                .foregroundStyle(RoomServicePalette.ink)
+                .foregroundStyle(DevMaidPalette.ink)
 
             Text(title)
                 .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(RoomServicePalette.ink)
+                .foregroundStyle(DevMaidPalette.ink)
 
             Text(detail)
                 .font(.system(size: 12))
-                .foregroundStyle(RoomServicePalette.muted)
+                .foregroundStyle(DevMaidPalette.muted)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -424,11 +447,16 @@ struct MetricCard: View {
                 .fill(.regularMaterial)
                 .overlay(
                     RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .fill(RoomServicePalette.cardStrong.opacity(0.52))
+                        .fill(DevMaidPalette.cardStrong.opacity(0.52))
                 )
                 .overlay(
                     RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .stroke(Color.white.opacity(0.42), lineWidth: 1)
+                        .stroke(DevMaidPalette.border, lineWidth: 1.1)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 22, style: .continuous)
+                        .stroke(DevMaidPalette.borderStrong.opacity(0.65), lineWidth: 0.7)
+                        .padding(0.8)
                 )
                 .shadow(color: Color.black.opacity(0.08), radius: 24, y: 18)
         )
@@ -453,7 +481,7 @@ struct BannerMessage: View {
         .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(tint.opacity(0.18), lineWidth: 1)
+                .stroke(tint.opacity(0.28), lineWidth: 1.1)
         )
         .foregroundStyle(tint)
     }
@@ -484,7 +512,7 @@ struct SidebarNavigationButton: View {
                     .fill(isSelected ? Color.white.opacity(0.18) : Color.clear)
                     .overlay(
                         RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .stroke(isSelected ? Color.white.opacity(0.22) : Color.clear, lineWidth: 1)
+                            .stroke(isSelected ? Color.white.opacity(0.34) : Color.clear, lineWidth: 1.1)
                     )
             )
             .contentShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -506,7 +534,278 @@ struct UpdateBadge: View {
             .background(tint.opacity(0.14), in: Capsule())
             .overlay(
                 Capsule()
-                    .stroke(tint.opacity(0.22), lineWidth: 1)
+                    .stroke(tint.opacity(0.3), lineWidth: 1.1)
+            )
+            .foregroundStyle(tint)
+    }
+}
+
+struct WorkflowStepPill: View {
+    let index: Int
+    let title: String
+    let detail: String
+    let symbolName: String
+    let tint: Color
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(tint.opacity(0.14))
+                    .frame(width: 34, height: 34)
+                Image(systemName: symbolName)
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(tint)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(index). \(title)")
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundStyle(DevMaidPalette.ink)
+                    .lineLimit(1)
+                Text(detail)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(DevMaidPalette.muted)
+                    .lineLimit(2)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity, minHeight: 66, alignment: .topLeading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(DevMaidPalette.border, lineWidth: 1.1)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(DevMaidPalette.borderStrong.opacity(0.55), lineWidth: 0.65)
+                .padding(0.8)
+        )
+    }
+}
+
+struct ActionDeckCard: View {
+    let eyebrow: String
+    let title: String
+    let detail: String
+    let symbolName: String
+    let tint: Color
+    let buttonTitle: String
+    let action: () -> Void
+
+    var body: some View {
+        SurfaceCard {
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(eyebrow.uppercased())
+                            .font(.system(size: 10, weight: .bold, design: .rounded))
+                            .tracking(0.8)
+                            .foregroundStyle(DevMaidPalette.muted)
+                        Text(title)
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                            .foregroundStyle(DevMaidPalette.ink)
+                    }
+                    Spacer()
+                    Image(systemName: symbolName)
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundStyle(tint)
+                        .frame(width: 36, height: 36)
+                        .background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+
+                Text(detail)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(DevMaidPalette.muted)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Button(buttonTitle, action: action)
+                    .buttonStyle(.bordered)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+struct GroupSummaryCard: View {
+    let title: String
+    let itemCount: Int
+    let totalBytes: Int64
+    let risk: RiskLevel
+    let language: AppLanguage
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(title)
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundStyle(DevMaidPalette.ink)
+                        .lineLimit(2)
+                    Text(language == .thai ? "\(itemCount) รายการ" : "\(itemCount) items")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(DevMaidPalette.muted)
+                }
+                Spacer(minLength: 8)
+                RiskBadge(risk: risk, language: language)
+            }
+
+            Text(DevMaidFormatters.byteString(totalBytes))
+                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .foregroundStyle(DevMaidPalette.ink)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(16)
+        .background(.thinMaterial, in: RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(DevMaidPalette.border, lineWidth: 1.1)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(DevMaidPalette.borderStrong.opacity(0.55), lineWidth: 0.65)
+                .padding(0.8)
+        )
+    }
+}
+
+struct ResultLocationCell: View {
+    let title: String
+    let parentPath: String
+    let groupName: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "folder.fill")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(DevMaidPalette.accent)
+
+                Text(title)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(DevMaidPalette.ink)
+                    .lineLimit(1)
+
+                if let groupName, !groupName.isEmpty {
+                    Text(groupName)
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundStyle(DevMaidPalette.accent)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 4)
+                        .background(DevMaidPalette.accent.opacity(0.10), in: Capsule())
+                        .lineLimit(1)
+                }
+            }
+
+            Text(parentPath)
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(DevMaidPalette.muted)
+                .lineLimit(1)
+                .truncationMode(.middle)
+        }
+    }
+}
+
+struct ResultCategoryCell: View {
+    let category: CleanupCategory
+    let language: AppLanguage
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Label(category.localizedDisplayName(in: language), systemImage: category.symbolName)
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(DevMaidPalette.ink)
+
+            Text(category.localizedShortDescription(in: language))
+                .font(.system(size: 11, weight: .medium))
+                .foregroundStyle(DevMaidPalette.muted)
+                .lineLimit(2)
+        }
+    }
+}
+
+struct DetailSectionCard<Content: View>: View {
+    let title: String
+    let detail: String?
+    @ViewBuilder let content: Content
+
+    init(title: String, detail: String? = nil, @ViewBuilder content: () -> Content) {
+        self.title = title
+        self.detail = detail
+        self.content = content()
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundStyle(DevMaidPalette.muted)
+
+                if let detail, !detail.isEmpty {
+                    Text(detail)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundStyle(DevMaidPalette.ink)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+
+            content
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(.thinMaterial)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(DevMaidPalette.border, lineWidth: 1.1)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 18, style: .continuous)
+                        .stroke(DevMaidPalette.borderStrong.opacity(0.55), lineWidth: 0.65)
+                        .padding(0.8)
+                )
+        )
+        .shadow(color: Color.white.opacity(0.18), radius: 1, y: 1)
+        .shadow(color: Color.black.opacity(0.04), radius: 12, y: 8)
+    }
+}
+
+struct ActionKindBadge: View {
+    let kind: HistoryActionKind
+    let language: AppLanguage
+
+    var tint: Color {
+        switch kind {
+        case .delete:
+            return DevMaidPalette.review
+        case .restore:
+            return DevMaidPalette.safe
+        }
+    }
+
+    var systemImage: String {
+        switch kind {
+        case .delete:
+            return "archivebox.fill"
+        case .restore:
+            return "arrow.uturn.backward.circle.fill"
+        }
+    }
+
+    var body: some View {
+        Label(kind.localizedDisplayName(in: language), systemImage: systemImage)
+            .font(.system(size: 11, weight: .bold, design: .rounded))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(tint.opacity(0.14), in: Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(tint.opacity(0.26), lineWidth: 1.1)
             )
             .foregroundStyle(tint)
     }

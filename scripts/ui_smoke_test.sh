@@ -13,11 +13,11 @@ cleanup() {
     kill "$APP_PID" 2>/dev/null || true
     sleep 1
   fi
-  launchctl unsetenv ROOMSERVICE_HOME 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_SEARCH_ROOTS 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_LANGUAGE 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_VOLATILE_PREFERENCES 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_TEST_SCAN_DELAY_MS 2>/dev/null || true
+  launchctl unsetenv DEVMAID_HOME 2>/dev/null || true
+  launchctl unsetenv DEVMAID_SEARCH_ROOTS 2>/dev/null || true
+  launchctl unsetenv DEVMAID_LANGUAGE 2>/dev/null || true
+  launchctl unsetenv DEVMAID_VOLATILE_PREFERENCES 2>/dev/null || true
+  launchctl unsetenv DEVMAID_TEST_SCAN_DELAY_MS 2>/dev/null || true
   pkill -f "$APP_BIN" 2>/dev/null || true
   rm -rf "$TMP_DIR"
 }
@@ -102,7 +102,11 @@ on run argv
       delay 0.2
       repeat with b in (every button of toolbar 1 of window 1)
         if description of b is targetLabel then
-          click b
+          try
+            perform action "AXPress" of b
+          on error
+            click b
+          end try
           return
         end if
       end repeat
@@ -111,6 +115,29 @@ on run argv
   end tell
 end run
 APPLESCRIPT
+}
+
+press_toolbar_button_until() {
+  local label="$1"
+  local expected_after="$2"
+  local attempts="${3:-6}"
+  local output=""
+
+  for _ in $(seq 1 "$attempts"); do
+    press_toolbar_button "$label" >/dev/null 2>&1 || true
+    sleep 1
+    output="$(toolbar_descriptions 2>/dev/null || true)"
+    if [[ "$output" == *"$expected_after"* ]]; then
+      echo "$output"
+      return 0
+    fi
+  done
+
+  echo "Toolbar button '$label' did not transition to '$expected_after'." >&2
+  if [[ -n "$output" ]]; then
+    echo "Last toolbar output: $output" >&2
+  fi
+  return 1
 }
 
 open_settings_page() {
@@ -132,15 +159,15 @@ printf 'console.log("hello");\n' > "$TMP_DIR/DemoApp/node_modules/index.js"
 
 pkill -f "$APP_BIN" 2>/dev/null || true
 
-if [[ "${ROOMSERVICE_SKIP_BUILD:-0}" != "1" ]]; then
+if [[ "${DEVMAID_SKIP_BUILD:-0}" != "1" ]]; then
   "$ROOT_DIR/scripts/build_release.sh" >/dev/null
 fi
 
-launchctl setenv ROOMSERVICE_HOME "$TMP_DIR/.roomservice-home"
-launchctl setenv ROOMSERVICE_SEARCH_ROOTS "$TMP_DIR"
-launchctl setenv ROOMSERVICE_LANGUAGE "en"
-launchctl setenv ROOMSERVICE_VOLATILE_PREFERENCES "1"
-launchctl setenv ROOMSERVICE_TEST_SCAN_DELAY_MS "4000"
+launchctl setenv DEVMAID_HOME "$TMP_DIR/.devmaid-home"
+launchctl setenv DEVMAID_SEARCH_ROOTS "$TMP_DIR"
+launchctl setenv DEVMAID_LANGUAGE "en"
+launchctl setenv DEVMAID_VOLATILE_PREFERENCES "1"
+launchctl setenv DEVMAID_TEST_SCAN_DELAY_MS "4000"
 open -na "$APP_BUNDLE"
 sleep 2
 APP_PID="$(pgrep -f "$APP_BIN" | tail -n 1)"
@@ -155,10 +182,8 @@ else
 fi
 
 wait_for_toolbar_label "$run_scan_label" 20 >/dev/null
-press_toolbar_button "$run_scan_label"
-wait_for_toolbar_label "$cancel_scan_label" 10 >/dev/null
-press_toolbar_button "$cancel_scan_label"
-wait_for_toolbar_label "$run_scan_label" 10 >/dev/null
+press_toolbar_button_until "$run_scan_label" "$cancel_scan_label" 8 >/dev/null
+press_toolbar_button_until "$cancel_scan_label" "$run_scan_label" 8 >/dev/null
 
 open_settings_page >/dev/null
 

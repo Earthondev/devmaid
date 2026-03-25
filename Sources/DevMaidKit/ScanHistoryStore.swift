@@ -14,9 +14,9 @@ public final class ScanHistoryStore {
         if let baseURL {
             resolvedBaseURL = baseURL
         } else if let override = ProcessInfo.processInfo.environment["DEVMAID_HOME"], !override.isEmpty {
-            resolvedBaseURL = URL(fileURLWithPath: RoomServicePaths.expandedHomePath(override, fileManager: fileManager), isDirectory: true)
+            resolvedBaseURL = URL(fileURLWithPath: DevMaidPaths.expandedHomePath(override, fileManager: fileManager), isDirectory: true)
         } else if let override = ProcessInfo.processInfo.environment["ROOMSERVICE_HOME"], !override.isEmpty {
-            resolvedBaseURL = URL(fileURLWithPath: RoomServicePaths.expandedHomePath(override, fileManager: fileManager), isDirectory: true)
+            resolvedBaseURL = URL(fileURLWithPath: DevMaidPaths.expandedHomePath(override, fileManager: fileManager), isDirectory: true)
         } else {
             resolvedBaseURL = fileManager.homeDirectoryForCurrentUser.appendingPathComponent(".roomservice", isDirectory: true)
         }

@@ -3,13 +3,13 @@ import SwiftUI
 
 @main
 struct DevMaidDesktopApp: App {
-    @StateObject private var model = RoomServiceAppModel()
+    @StateObject private var model = DevMaidAppModel()
 
-    private var copy: RoomServiceCopy { model.copy }
+    private var copy: DevMaidCopy { model.copy }
 
     var body: some Scene {
         WindowGroup("DevMaid") {
-            RoomServiceRootView()
+            DevMaidRootView()
                 .environmentObject(model)
                 .frame(minWidth: 1180, minHeight: 760)
                 .preferredColorScheme(.light)
@@ -56,7 +56,7 @@ struct DevMaidDesktopApp: App {
 
             CommandGroup(after: .help) {
                 Button(copy.menuSupport) {
-                    NSWorkspace.shared.open(RoomServiceLinks.support)
+                    NSWorkspace.shared.open(DevMaidLinks.support)
                 }
             }
         }
@@ -70,14 +70,14 @@ struct DevMaidDesktopApp: App {
     }
 
     @ViewBuilder
-    private func navigationButton(for destination: RoomServiceDestination, shortcut: KeyEquivalent) -> some View {
+    private func navigationButton(for destination: DevMaidDestination, shortcut: KeyEquivalent) -> some View {
         Button(destination.title(in: model.language)) {
             openDestination(destination)
         }
         .keyboardShortcut(shortcut, modifiers: .command)
     }
 
-    private func openDestination(_ destination: RoomServiceDestination) {
+    private func openDestination(_ destination: DevMaidDestination) {
         withAnimation(.spring(response: 0.35, dampingFraction: 0.86)) {
             model.destination = destination
         }

@@ -14,25 +14,26 @@ cleanup() {
     kill "$APP_PID" 2>/dev/null || true
     sleep 1
   fi
-  launchctl unsetenv ROOMSERVICE_HOME 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_SEARCH_ROOTS 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_LANGUAGE 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_VOLATILE_PREFERENCES 2>/dev/null || true
-  launchctl unsetenv ROOMSERVICE_UPDATE_FEED_URL 2>/dev/null || true
+  launchctl unsetenv DEVMAID_HOME 2>/dev/null || true
+  launchctl unsetenv DEVMAID_SEARCH_ROOTS 2>/dev/null || true
+  launchctl unsetenv DEVMAID_LANGUAGE 2>/dev/null || true
+  launchctl unsetenv DEVMAID_VOLATILE_PREFERENCES 2>/dev/null || true
+  launchctl unsetenv DEVMAID_UPDATE_FEED_URL 2>/dev/null || true
   pkill -f "$APP_BIN" 2>/dev/null || true
   rm -rf "$TMP_DIR"
 }
 
 trap cleanup EXIT
 
-if [[ ! -x "$APP_BIN" ]]; then
-  "$ROOT_DIR/scripts/build_release.sh" >/dev/null
-fi
+"$ROOT_DIR/scripts/build_release.sh" >/dev/null
 
 mkdir -p "$OUTPUT_DIR"
 
+pkill -f "$APP_BIN" 2>/dev/null || true
+sleep 1
+
 WORKSPACE="$TMP_DIR/workspace"
-APP_HOME="$TMP_DIR/.roomservice-home"
+APP_HOME="$TMP_DIR/.devmaid-home"
 UPDATE_FEED="$TMP_DIR/appcast.json"
 mkdir -p \
   "$WORKSPACE/ArchiveCandidate/node_modules/react" \
@@ -68,11 +69,11 @@ cat > "$UPDATE_FEED" <<'JSON'
 JSON
 
 env \
-  ROOMSERVICE_HOME="$APP_HOME" \
-  ROOMSERVICE_SEARCH_ROOTS="$WORKSPACE" \
-  ROOMSERVICE_LANGUAGE="en" \
-  ROOMSERVICE_VOLATILE_PREFERENCES="1" \
-  ROOMSERVICE_UPDATE_FEED_URL="$UPDATE_FEED" \
+  DEVMAID_HOME="$APP_HOME" \
+  DEVMAID_SEARCH_ROOTS="$WORKSPACE" \
+  DEVMAID_LANGUAGE="en" \
+  DEVMAID_VOLATILE_PREFERENCES="1" \
+  DEVMAID_UPDATE_FEED_URL="$UPDATE_FEED" \
   swift run devmaid delete --category node-modules --search-root "$WORKSPACE" --all --yes >/dev/null
 
 mkdir -p "$WORKSPACE/RecreatedWorkspace/node_modules/next"
@@ -85,11 +86,11 @@ path.parent.mkdir(parents=True, exist_ok=True)
 path.write_bytes(("module.exports = 'next';\n" * 2200).encode())
 PY
 
-launchctl setenv ROOMSERVICE_HOME "$APP_HOME"
-launchctl setenv ROOMSERVICE_SEARCH_ROOTS "$WORKSPACE"
-launchctl setenv ROOMSERVICE_LANGUAGE "en"
-launchctl setenv ROOMSERVICE_VOLATILE_PREFERENCES "1"
-launchctl setenv ROOMSERVICE_UPDATE_FEED_URL "$UPDATE_FEED"
+launchctl setenv DEVMAID_HOME "$APP_HOME"
+launchctl setenv DEVMAID_SEARCH_ROOTS "$WORKSPACE"
+launchctl setenv DEVMAID_LANGUAGE "en"
+launchctl setenv DEVMAID_VOLATILE_PREFERENCES "1"
+launchctl setenv DEVMAID_UPDATE_FEED_URL "$UPDATE_FEED"
 open -na "$APP_BUNDLE"
 
 run_osascript() {
@@ -138,6 +139,60 @@ tell application "DevMaid" to activate
 APPLESCRIPT
 }
 
+toolbar_descriptions() {
+  run_osascript <<'APPLESCRIPT'
+tell application "DevMaid" to activate
+delay 0.4
+tell application "System Events"
+  tell process "DevMaid"
+    set frontmost to true
+    delay 0.4
+    set output to {}
+    repeat with b in (every button of toolbar 1 of window 1)
+      set end of output to description of b
+    end repeat
+    return output
+  end tell
+end tell
+APPLESCRIPT
+}
+
+wait_for_toolbar_label() {
+  local expected="$1"
+  local attempts="${2:-25}"
+  local output=""
+
+  for _ in $(seq 1 "$attempts"); do
+    output="$(toolbar_descriptions 2>/dev/null || true)"
+    if [[ "$output" == *"$expected"* ]]; then
+      return 0
+    fi
+    sleep 1
+  done
+
+  echo "Timed out waiting for toolbar label: $expected" >&2
+  [[ -n "$output" ]] && echo "Last toolbar output: $output" >&2
+  return 1
+}
+
+wait_for_toolbar_without_label() {
+  local blocked="$1"
+  local attempts="${2:-25}"
+  local output=""
+
+  for _ in $(seq 1 "$attempts"); do
+    output="$(toolbar_descriptions 2>/dev/null || true)"
+    if [[ "$output" != *"$blocked"* ]]; then
+      return 0
+    fi
+    sleep 1
+  done
+
+  echo "Timed out waiting for toolbar to remove label: $blocked" >&2
+  [[ -n "$output" ]] && echo "Last toolbar output: $output" >&2
+  return 1
+}
+
 focus_main_window() {
   run_osascript <<'APPLESCRIPT'
 tell application "DevMaid" to activate
@@ -169,6 +224,23 @@ end run
 APPLESCRIPT
 }
 
+select_navigation_menu_item() {
+  local label="$1"
+  run_osascript - "$label" <<'APPLESCRIPT'
+on run argv
+  set targetLabel to item 1 of argv
+  tell application "DevMaid" to activate
+  delay 0.2
+  tell application "System Events"
+    tell process "DevMaid"
+      set frontmost to true
+      click menu item targetLabel of menu 1 of menu bar item "Navigate" of menu bar 1
+    end tell
+  end tell
+end run
+APPLESCRIPT
+}
+
 click_toolbar_button() {
   local label="$1"
   run_osascript - "$label" <<'APPLESCRIPT'
@@ -181,7 +253,11 @@ on run argv
       set frontmost to true
       repeat with b in (every button of toolbar 1 of window 1)
         if description of b is targetLabel then
-          click b
+          try
+            perform action "AXPress" of b
+          on error
+            click b
+          end try
           return
         end if
       end repeat
@@ -190,6 +266,26 @@ on run argv
   end tell
 end run
 APPLESCRIPT
+}
+
+press_toolbar_button_until() {
+  local label="$1"
+  local expected_after="$2"
+  local attempts="${3:-8}"
+  local output=""
+
+  for _ in $(seq 1 "$attempts"); do
+    click_toolbar_button "$label" >/dev/null 2>&1 || true
+    sleep 1
+    output="$(toolbar_descriptions 2>/dev/null || true)"
+    if [[ "$output" == *"$expected_after"* ]]; then
+      return 0
+    fi
+  done
+
+  echo "Toolbar button '$label' did not transition to '$expected_after'." >&2
+  [[ -n "$output" ]] && echo "Last toolbar output: $output" >&2
+  return 1
 }
 
 window_id_for_title() {
@@ -241,30 +337,65 @@ capture_window() {
   screencapture -x -l "$window_id" "$output_path"
 }
 
-wait_for_devmaid
-APP_PID="$(pgrep -f "$APP_BIN" | tail -n 1)"
-activate_app
-wait_for_main_window
-focus_main_window
-sleep 1
+launch_for_capture() {
+  local destination="$1"
+  local auto_scan="${2:-0}"
 
+  pkill -f "$APP_BIN" 2>/dev/null || true
+  sleep 1
+
+  launchctl setenv DEVMAID_HOME "$APP_HOME"
+  launchctl setenv DEVMAID_SEARCH_ROOTS "$WORKSPACE"
+  launchctl setenv DEVMAID_LANGUAGE "en"
+  launchctl setenv DEVMAID_VOLATILE_PREFERENCES "1"
+  launchctl setenv DEVMAID_UPDATE_FEED_URL "$UPDATE_FEED"
+  launchctl setenv DEVMAID_LAUNCH_DESTINATION "$destination"
+  launchctl setenv DEVMAID_AUTO_RUN_SCAN_ON_LAUNCH "$auto_scan"
+
+  open -na "$APP_BUNDLE"
+
+  wait_for_devmaid
+  APP_PID="$(pgrep -f "$APP_BIN" | tail -n 1)"
+  activate_app
+  wait_for_main_window
+  focus_main_window
+  sleep 1
+}
+
+close_capture_app() {
+  if [[ -n "$APP_PID" ]] && kill -0 "$APP_PID" 2>/dev/null; then
+    kill "$APP_PID" 2>/dev/null || true
+    sleep 1
+  fi
+  APP_PID=""
+}
+
+launch_for_capture "overview" "0"
+wait_for_toolbar_without_label "Quarantine Selected" 10
 capture_window "DevMaid" "$OUTPUT_DIR/DevMaid-overview.png"
+close_capture_app
 
-click_toolbar_button "Run Scan"
-sleep 2
+launch_for_capture "results" "1"
+wait_for_toolbar_label "Quarantine Selected" 40
+wait_for_toolbar_label "Run Scan" 40
+sleep 1
 capture_window "DevMaid" "$OUTPUT_DIR/DevMaid-results.png"
+close_capture_app
 
-send_shortcut "3"
-sleep 1
+launch_for_capture "history" "0"
+wait_for_toolbar_without_label "Quarantine Selected" 10
 capture_window "DevMaid" "$OUTPUT_DIR/DevMaid-history.png"
+close_capture_app
 
-send_shortcut "4"
-sleep 1
+launch_for_capture "settings" "0"
+wait_for_toolbar_without_label "Quarantine Selected" 10
 capture_window "DevMaid" "$OUTPUT_DIR/DevMaid-settings.png"
+close_capture_app
 
-send_shortcut "5"
-sleep 1
+launch_for_capture "about" "0"
+wait_for_toolbar_without_label "Quarantine Selected" 10
 capture_window "DevMaid" "$OUTPUT_DIR/DevMaid-about.png"
+close_capture_app
 
 echo "Saved screenshots:"
 echo "$OUTPUT_DIR/DevMaid-overview.png"

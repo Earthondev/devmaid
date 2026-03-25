@@ -1,5 +1,5 @@
 import Foundation
-import RoomServiceKit
+import DevMaidKit
 
 enum AppLanguage: String, CaseIterable, Identifiable {
     case english = "en"
@@ -35,13 +35,13 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     }
 }
 
-enum RoomServiceOperation {
+enum DevMaidOperation {
     case scanning
     case quarantining
     case restoring
 }
 
-enum RoomServiceUpdateState {
+enum DevMaidUpdateState {
     case idle
     case checking
     case upToDate
@@ -50,7 +50,7 @@ enum RoomServiceUpdateState {
     case failed(String)
 }
 
-struct RoomServiceCopy {
+struct DevMaidCopy {
     let language: AppLanguage
 
     private var isThai: Bool { language == .thai }
@@ -100,10 +100,19 @@ struct RoomServiceCopy {
     var riskLabelsTitle: String { isThai ? "ระดับความเสี่ยง" : "Risk labels" }
     var recentActivityTitle: String { isThai ? "กิจกรรมล่าสุด" : "Recent activity" }
     var noRecentActivity: String { isThai ? "ยังไม่มีประวัติการล้าง เริ่มสแกน ตรวจรายการ แล้วค่อยกักกันเมื่อพร้อม" : "No cleanup history yet. Run a scan, review the results, and quarantine selected items when you're ready." }
+    var overviewActionsTitle: String { isThai ? "ทางลัดที่แนะนำ" : "Recommended next steps" }
+    var overviewActionsDetail: String { isThai ? "เริ่มจากการสแกนก่อน แล้วค่อยไล่ review หรือปรับ coverage ตาม workflow ของคุณ" : "Start with a scan, then review the findings or tune coverage for your workflow." }
+    var overviewActionScanTitle: String { isThai ? "สแกนเครื่องรอบถัดไป" : "Run the next scan" }
+    var overviewActionScanDetail: String { isThai ? "ใช้ search roots และหมวดที่เลือกตอนนี้เพื่อดึงภาพรวมล่าสุดของ dev junk บนเครื่อง" : "Use the current scan roots and selected categories to refresh the latest view of reclaimable dev junk." }
+    var overviewActionResultsTitle: String { isThai ? "รีวิวก่อนกักกัน" : "Review before quarantine" }
+    var overviewActionResultsDetail: String { isThai ? "เปิดผลสแกนเพื่อตรวจ path, risk label และเลือกเฉพาะรายการที่พร้อมย้ายเข้า quarantine" : "Open the results to inspect paths, risk labels, and select only the items you want to quarantine." }
+    var overviewActionSettingsTitle: String { isThai ? "ปรับ coverage ให้เหมาะ" : "Tune your coverage" }
+    var overviewActionSettingsDetail: String { isThai ? "เช็ก exclusions, scan roots และค่า safety defaults ก่อน cleanup รอบจริง" : "Review exclusions, scan roots, and safety defaults before your next real cleanup pass." }
 
     var visibleItemsLabel: String { isThai ? "รายการที่มองเห็น" : "Visible items" }
     var visibleSizeLabel: String { isThai ? "ขนาดที่มองเห็น" : "Visible size" }
     var selectedLabel: String { isThai ? "ที่เลือก" : "Selected" }
+    var groupedByProjectLabel: String { isThai ? "กลุ่มที่มองเห็น" : "Visible groups" }
     var warningsTitle: String { isThai ? "คำเตือน" : "Warnings" }
     var reviewCleanupTitle: String { isThai ? "ยืนยันการกักกัน" : "Review cleanup" }
     var quarantineAction: String { isThai ? "ย้ายเข้า Quarantine" : "Quarantine" }
@@ -120,13 +129,15 @@ struct RoomServiceCopy {
             : "Your selection includes danger-labeled items such as Docker data. DevMaid will still quarantine them first, but you should confirm before proceeding."
     }
     var scanResultsTitle: String { isThai ? "ผลการสแกน" : "Scan Results" }
+    var itemColumnTitle: String { isThai ? "รายการ" : "Item" }
+    var actionsColumnTitle: String { isThai ? "การทำงาน" : "Actions" }
     func latestCleanupStats(items: Int, bytes: String) -> String {
         isThai ? "\(items) รายการ • \(bytes)" : "\(items) item(s) • \(bytes)"
     }
     func visibleSummary(count: Int, bytes: String) -> String {
         isThai ? "พบ \(count) รายการ • \(bytes)" : "\(count) visible item(s) • \(bytes)"
     }
-    func progressTitle(for operation: RoomServiceOperation?) -> String {
+    func progressTitle(for operation: DevMaidOperation?) -> String {
         switch operation {
         case .scanning:
             return isThai ? "กำลังสแกน…" : "Scanning…"
@@ -147,6 +158,16 @@ struct RoomServiceCopy {
     var emptyResultsBeforeScan: String { isThai ? "เริ่มสแกนเพื่อดูรายการที่ล้างได้" : "Run a scan to see your cleanup candidates." }
     var emptyResultsFiltered: String { isThai ? "ไม่มีรายการที่ตรงกับ filter ตอนนี้" : "No results match the current filters." }
     var emptyResultsDetail: String { isThai ? "DevMaid จะแสดงทุกอย่างก่อนเสมอ ก่อนย้ายอะไรเข้า quarantine" : "DevMaid always shows what it finds before anything is quarantined." }
+    var resultsWorkflowTitle: String { isThai ? "workflow ที่แนะนำ" : "Recommended workflow" }
+    var resultsWorkflowDetail: String { isThai ? "สแกน ตรวจ แล้วค่อยกักกันเป็นชุด" : "Scan, review, then quarantine in batches." }
+    var resultsWorkflowScanDetail: String { isThai ? "ดึงภาพรวมล่าสุด" : "Refresh the latest scan" }
+    func resultsWorkflowReviewDetail(count: Int, bytes: String) -> String {
+        isThai ? "กำลังเห็น \(count) รายการ • \(bytes)" : "\(count) visible • \(bytes)"
+    }
+    var resultsWorkflowQuarantineDetail: String { isThai ? "ย้ายชุดที่พร้อมก่อน" : "Quarantine the ready batch" }
+    var emptyResultsSettingsHint: String { isThai ? "เปิด Settings" : "Open Settings" }
+    var groupedResultsTitle: String { isThai ? "กลุ่มที่เด่นที่สุดตอนนี้" : "Largest visible groups" }
+    var groupedResultsDetail: String { isThai ? "ดูเร็วว่าพื้นที่ส่วนใหญ่กองอยู่ที่กลุ่มไหน" : "See which groups dominate the result set." }
     var inspectorTitle: String { isThai ? "ตัวตรวจสอบ" : "Inspector" }
     var inspectorEmpty: String { isThai ? "เลือกรายการอย่างน้อยหนึ่งรายการเพื่อดูผลกระทบ ระดับความเสี่ยง และ path แบบเต็ม" : "Select one or more items to inspect the cleanup impact, risk label, and exact path." }
     var pathTitle: String { isThai ? "Path" : "Path" }
@@ -157,19 +178,34 @@ struct RoomServiceCopy {
         isThai ? "เลือกอยู่ \(count) รายการ" : "\(count) item(s) selected"
     }
     var batchCleanupDetail: String { isThai ? "DevMaid จะย้ายรายการเหล่านี้เข้า quarantine ก่อน และคุณกู้คืนได้ภายหลังจาก History" : "DevMaid will move these items into quarantine first. You can restore them later from History." }
+    var mixedRiskSelectionDetail: String { isThai ? "มีหลายระดับความเสี่ยงในชุดเดียวกัน" : "This selection mixes multiple risk levels." }
+    var uniformRiskSelectionDetail: String { isThai ? "ชุดนี้กักกันพร้อมกันได้ค่อนข้างมั่นใจ" : "This batch is consistent enough to quarantine together." }
+    func itemsCountLabel(_ count: Int) -> String {
+        isThai ? "\(count) รายการ" : "\(count) items"
+    }
 
     var historyTitle: String { isThai ? "ประวัติ" : "History" }
+    var historyTimelineTitle: String { isThai ? "ไทม์ไลน์การล้างล่าสุด" : "Recent cleanup timeline" }
+    var historyTimelineDetail: String { isThai ? "เลือก action เพื่อดูสิ่งที่ย้ายเข้า quarantine และกู้คืนกลับได้เมื่อจำเป็น" : "Select an action to inspect what moved into quarantine and restore it when needed." }
     var restoreAction: String { isThai ? "กู้คืน Action นี้" : "Restore Action" }
     var itemsMetricTitle: String { isThai ? "รายการ" : "Items" }
     var itemsMetricDetail: String { isThai ? "จำนวน object ที่อยู่ใน action นี้" : "Objects tracked in this action." }
     var bytesMetricTitle: String { isThai ? "ขนาด" : "Bytes" }
     var bytesMetricDetail: String { isThai ? "ขนาดรวมที่บันทึกไว้ใน manifest" : "Total footprint recorded in the action manifest." }
     var manifestItemsTitle: String { isThai ? "รายการใน Manifest" : "Manifest items" }
+    var manifestItemsDetail: String { isThai ? "ดู path เดิม หมวด และระดับความเสี่ยงของรายการที่อยู่ใน action นี้" : "Review the original paths, categories, and risk labels stored in this action." }
     var noManifestPreview: String { isThai ? "ไม่มี manifest preview สำหรับ history รายการนี้" : "No manifest preview available for this history entry." }
     var sourceActionPrefix: String { isThai ? "อ้างอิงจาก action:" : "Source action:" }
     var historyEmpty: String { isThai ? "เลือก history entry เพื่อดูรายละเอียดหรือกู้คืน action การล้าง" : "Select a history entry to inspect it or restore a cleanup action." }
+    var selectionImpactTitle: String { isThai ? "ผลกระทบของชุดที่เลือก" : "Selection impact" }
+    var riskMixTitle: String { isThai ? "ระดับความเสี่ยงในชุดนี้" : "Risk mix" }
+    var topCategoriesTitle: String { isThai ? "หมวดที่เด่นในชุดนี้" : "Top categories in this batch" }
+    var noSelectionYetTitle: String { isThai ? "ยังไม่ได้เลือกรายการ" : "No selection yet" }
+    var selectedPathTitle: String { isThai ? "รายการที่เลือกอยู่" : "Current selection" }
 
     var settingsTitle: String { isThai ? "การตั้งค่า" : "Settings" }
+    var settingsHeroBadge: String { isThai ? "ศูนย์ควบคุมการทำงาน" : "Control center" }
+    var settingsHeroDetail: String { isThai ? "ปรับ coverage, ความปลอดภัย, ภาษา, อัปเดต และลิงก์ช่วยเหลือของ DevMaid จากจุดเดียว" : "Tune DevMaid's coverage, safety defaults, language, updates, and support links from one place." }
     var notificationsTitle: String { isThai ? "การแจ้งเตือนอัจฉริยะ" : "Smart alerts" }
     var notificationsDetail: String { isThai ? "แจ้งเตือนเมื่อพื้นที่ว่างต่ำเกินไป หรือเมื่อรอบสแกนล่าสุดพบ reclaimable storage เพิ่มขึ้นมากผิดปกติ" : "Get notified when free space drops too low or when a scan finds an unusual reclaimable-storage spike." }
     var notificationsEnabledTitle: String { isThai ? "เปิดการแจ้งเตือนภายในเครื่อง" : "Enable local notifications" }
@@ -223,6 +259,8 @@ struct RoomServiceCopy {
     var onboardingPrimaryAction: String { isThai ? "เปิด Privacy & Security" : "Open Privacy & Security" }
     var onboardingSecondaryAction: String { isThai ? "เริ่มใช้งาน" : "Start using DevMaid" }
     var onboardingOpenSettingsAction: String { isThai ? "ไปที่ Settings" : "Go to Settings" }
+    var onboardingChecklistTitle: String { isThai ? "ก่อนเริ่มสแกนครั้งแรก" : "Before your first scan" }
+    var onboardingChecklistDetail: String { isThai ? "เช็ก 3 จุดนี้ก่อน แล้วประสบการณ์รอบแรกจะลื่นและปลอดภัยกว่ามาก" : "Check these three things first and your first cleanup pass will feel much smoother and safer." }
     var reopenOnboardingAction: String { isThai ? "เปิดคู่มือเริ่มต้นอีกครั้ง" : "Reopen welcome guide" }
     var scanRootsTitle: String { isThai ? "โฟลเดอร์ที่ใช้สแกน" : "Scan roots" }
     var scanRootsDescription: String { isThai ? "DevMaid จะสแกนรากโฟลเดอร์เหล่านี้เพื่อหา target แบบ recursive อย่าง `node_modules`, `.venv`, `build`, `dist` และ `.next`" : "DevMaid scans these workspace roots for recursive targets like `node_modules`, `.venv`, `build`, `dist`, and `.next`." }
@@ -268,6 +306,8 @@ struct RoomServiceCopy {
     var openPrivacyPolicyAction: String { isThai ? "เปิดไฟล์ Privacy" : "Open Privacy file" }
 
     var aboutDescription: String { isThai ? "ล้าง Xcode, Docker, node_modules, virtual environments, browser-test caches และไฟล์ dev อื่น ๆ แบบเห็นก่อนลบ" : "Preview-first cleanup for Xcode, Docker, node_modules, virtual environments, browser-test caches, and the other storage problems that hit developer Macs hardest." }
+    var aboutHeroBadge: String { isThai ? "แจกฟรีสำหรับสายพัฒนา" : "Free developer utility" }
+    var aboutHeroDetail: String { isThai ? "DevMaid คือ native Mac app ที่ใช้ shared cleanup engine เดียวกับ CLI และออกแบบมาให้ล้างแบบ preview-first, quarantine-first, undo ได้จริง" : "DevMaid is a native Mac app powered by the same shared cleanup engine as the CLI, built around preview-first, quarantine-first cleanup with real undo support." }
     var versionTitle: String { isThai ? "เวอร์ชัน" : "Version" }
     var versionDetail: String { isThai ? "เดสก์ท็อป GUI ที่ใช้ shared cleanup engine เดียวกับ CLI" : "Desktop GUI powered by the same shared cleanup engine as the CLI." }
     var cliTitle: String { "CLI" }
@@ -329,7 +369,7 @@ struct RoomServiceCopy {
         isThai ? "รอบสแกนล่าสุดพบ reclaimable storage เพิ่มขึ้น \(delta) ลองเปิด DevMaid เพื่อตรวจรายการใหม่" : "The latest scan found \(delta) more reclaimable storage. Open DevMaid to review the new candidates."
     }
 
-    func updateStatusText(for state: RoomServiceUpdateState) -> String {
+    func updateStatusText(for state: DevMaidUpdateState) -> String {
         switch state {
         case .idle:
             return updateStatusIdle
@@ -346,7 +386,7 @@ struct RoomServiceCopy {
         }
     }
 
-    func updateBadgeTitle(for state: RoomServiceUpdateState) -> String {
+    func updateBadgeTitle(for state: DevMaidUpdateState) -> String {
         switch state {
         case .idle:
             return updateIdleBadge
@@ -364,7 +404,7 @@ struct RoomServiceCopy {
     }
 }
 
-extension RoomServiceDestination {
+extension DevMaidDestination {
     func title(in language: AppLanguage) -> String {
         switch (self, language) {
         case (.overview, .english): return "Overview"
@@ -437,7 +477,46 @@ extension RiskLevel {
     }
 }
 
+extension HistoryActionKind {
+    func localizedDisplayName(in language: AppLanguage) -> String {
+        switch (self, language) {
+        case (.delete, .english): return "Cleanup"
+        case (.delete, .thai): return "การล้าง"
+        case (.restore, .english): return "Restore"
+        case (.restore, .thai): return "การกู้คืน"
+        }
+    }
+}
+
 extension CleanupCategory {
+    func localizedDisplayName(in language: AppLanguage) -> String {
+        guard language == .thai else { return displayName }
+        switch self {
+        case .codeEditors: return "Code Editors"
+        case .xcodeDerivedData: return "Xcode DerivedData"
+        case .xcodeArchives: return "Xcode Archives"
+        case .coreSimulator: return "CoreSimulator"
+        case .dockerData: return "Docker Data"
+        case .nodeModules: return "node_modules"
+        case .pythonVirtualEnvs: return "Python Envs"
+        case .projectArtifacts: return "Project Artifacts"
+        case .homebrewCache: return "Homebrew Cache"
+        case .npmCache: return "npm Cache"
+        case .pipCache: return "pip Cache"
+        case .poetryCache: return "Poetry Cache"
+        case .yarnCache: return "Yarn Cache"
+        case .pnpmStore: return "pnpm Store"
+        case .cargoCache: return "Cargo Cache"
+        case .nugetCache: return "NuGet Cache"
+        case .goCache: return "Go Cache"
+        case .playwrightCache: return "Playwright Cache"
+        case .cypressCache: return "Cypress Cache"
+        case .gradleCache: return "Gradle Cache"
+        case .androidArtifacts: return "Android Artifacts"
+        case .unityCache: return "Unity Cache"
+        }
+    }
+
     func localizedShortDescription(in language: AppLanguage) -> String {
         guard language == .thai else { return shortDescription }
         switch self {

@@ -9,8 +9,8 @@ let package = Package(
     ],
     products: [
         .library(
-            name: "RoomServiceKit",
-            targets: ["RoomServiceKit"]
+            name: "DevMaidKit",
+            targets: ["DevMaidKit"]
         ),
         .executable(
             name: "devmaid",
@@ -23,17 +23,17 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "RoomServiceKit"
+            name: "DevMaidKit"
         ),
         .executableTarget(
             name: "DevMaidCLI",
-            dependencies: ["RoomServiceKit"],
-            path: "Sources/RoomServiceCLI"
+            dependencies: ["DevMaidKit"],
+            path: "Sources/DevMaidCLI"
         ),
         .executableTarget(
             name: "DevMaidApp",
-            dependencies: ["RoomServiceKit"],
-            path: "Sources/RoomServiceApp",
+            dependencies: ["DevMaidKit"],
+            path: "Sources/DevMaidApp",
             resources: [
                 .process("Resources"),
             ],

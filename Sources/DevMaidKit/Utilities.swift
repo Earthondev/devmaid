@@ -1,6 +1,6 @@
 import Foundation
 
-public enum RoomServicePaths {
+public enum DevMaidPaths {
     public static func expandedHomePath(_ path: String, fileManager: FileManager = .default) -> String {
         if path == "~" {
             return fileManager.homeDirectoryForCurrentUser.path
@@ -46,7 +46,7 @@ public enum RoomServicePaths {
     }
 }
 
-public enum RoomServiceFormatters {
+public enum DevMaidFormatters {
     private static func makeByteFormatter() -> ByteCountFormatter {
         let formatter = ByteCountFormatter()
         formatter.allowedUnits = [.useKB, .useMB, .useGB, .useTB]
