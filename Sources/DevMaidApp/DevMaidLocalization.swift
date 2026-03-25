@@ -185,6 +185,8 @@ struct DevMaidCopy {
     }
 
     var historyTitle: String { isThai ? "ประวัติ" : "History" }
+    var historyHeroBadge: String { isThai ? "ไทม์ไลน์การกู้คืน" : "Restore timeline" }
+    var historyHeroDetail: String { isThai ? "ดู action ล่าสุดที่ DevMaid ย้ายเข้า quarantine แล้วเปิดดู manifest หรือกู้คืนได้จากหน้าเดียว" : "Review the latest actions DevMaid moved into quarantine, inspect each manifest, and restore from one place." }
     var historyTimelineTitle: String { isThai ? "ไทม์ไลน์การล้างล่าสุด" : "Recent cleanup timeline" }
     var historyTimelineDetail: String { isThai ? "เลือก action เพื่อดูสิ่งที่ย้ายเข้า quarantine และกู้คืนกลับได้เมื่อจำเป็น" : "Select an action to inspect what moved into quarantine and restore it when needed." }
     var restoreAction: String { isThai ? "กู้คืน Action นี้" : "Restore Action" }

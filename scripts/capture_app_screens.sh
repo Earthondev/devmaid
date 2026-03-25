@@ -321,6 +321,10 @@ capture_window() {
   local output_path="$2"
   local window_id=""
 
+  activate_app >/dev/null 2>&1 || true
+  focus_main_window >/dev/null 2>&1 || true
+  sleep 1
+
   for _ in $(seq 1 20); do
     window_id="$(window_id_for_title "$title" | tr -d '\n')"
     if [[ -n "$window_id" ]]; then

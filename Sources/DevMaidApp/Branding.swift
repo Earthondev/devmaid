@@ -467,13 +467,28 @@ struct BannerMessage: View {
     let text: String
     let systemImage: String
     let tint: Color
+    var onDismiss: (() -> Void)? = nil
 
     var body: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 12) {
             Image(systemName: systemImage)
+                .font(.system(size: 14, weight: .bold))
+            
             Text(text)
                 .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+            
             Spacer()
+            
+            if let onDismiss {
+                Button(action: onDismiss) {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 14, weight: .bold))
+                        .opacity(0.64)
+                }
+                .buttonStyle(.plain)
+                .help("Dismiss")
+            }
         }
         .font(.system(size: 13, weight: .medium))
         .padding(.horizontal, 14)

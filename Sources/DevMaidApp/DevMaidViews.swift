@@ -5,6 +5,8 @@ struct DevMaidRootView: View {
     @EnvironmentObject private var model: DevMaidAppModel
 
     private var copy: DevMaidCopy { model.copy }
+    private let sidebarTopInset: CGFloat = 56
+    private let contentTopInset: CGFloat = 10
 
     var body: some View {
         NavigationSplitView {
@@ -16,13 +18,17 @@ struct DevMaidRootView: View {
 
                 VStack(spacing: 16) {
                     if let message = model.lastActionMessage {
-                        BannerMessage(text: message, systemImage: "checkmark.seal.fill", tint: DevMaidPalette.safe)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                        BannerMessage(text: message, systemImage: "checkmark.seal.fill", tint: DevMaidPalette.safe) {
+                            model.lastActionMessage = nil
+                        }
+                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
                     if let error = model.lastError {
-                        BannerMessage(text: error, systemImage: "exclamationmark.octagon.fill", tint: DevMaidPalette.danger)
-                            .transition(.move(edge: .top).combined(with: .opacity))
+                        BannerMessage(text: error, systemImage: "exclamationmark.octagon.fill", tint: DevMaidPalette.danger) {
+                            model.lastError = nil
+                        }
+                        .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
                     if !model.lastRestoreSkipped.isEmpty {
@@ -30,7 +36,9 @@ struct DevMaidRootView: View {
                             text: copy.skippedRestoreBanner,
                             systemImage: "arrow.triangle.2.circlepath.circle.fill",
                             tint: DevMaidPalette.review
-                        )
+                        ) {
+                            model.lastRestoreSkipped = []
+                        }
                         .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
@@ -39,7 +47,9 @@ struct DevMaidRootView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                         .transition(.opacity.combined(with: .scale(scale: 0.98)))
                 }
-                .padding(24)
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
+                .padding(.top, 24 + contentTopInset)
                 .animation(.easeInOut(duration: 0.25), value: model.lastActionMessage)
                 .animation(.easeInOut(duration: 0.25), value: model.lastError)
                 .animation(.spring(response: 0.42, dampingFraction: 0.86), value: model.destination)
@@ -93,7 +103,7 @@ struct DevMaidRootView: View {
                     .foregroundStyle(.white)
             }
             .padding(.horizontal, 24)
-            .padding(.top, 24)
+            .padding(.top, sidebarTopInset)
             .padding(.bottom, 14)
             .frame(maxWidth: .infinity, alignment: .leading)
 
@@ -983,162 +993,196 @@ struct HistoryScreen: View {
     private var copy: DevMaidCopy { model.copy }
 
     var body: some View {
-        HStack(spacing: 18) {
-            SurfaceCard(padding: 0) {
-                VStack(alignment: .leading, spacing: 0) {
-                    SectionTitleRow(
-                        title: copy.historyTimelineTitle,
-                        detail: copy.historyTimelineDetail
-                    )
-                    .padding(18)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 24) {
+                HeroPanel {
+                    HStack(alignment: .top, spacing: 24) {
+                        VStack(alignment: .leading, spacing: 14) {
+                            Text(copy.historyHeroBadge)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(DevMaidPalette.safe.opacity(0.12), in: Capsule())
+                                .foregroundStyle(DevMaidPalette.safe)
 
-                    List(selection: Binding(
-                        get: { model.selectedHistoryID },
-                        set: { model.selectHistory(id: $0) }
-                    )) {
-                        ForEach(model.historyEntries) { entry in
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack(alignment: .top) {
-                                    ActionKindBadge(kind: entry.kind, language: model.language)
-                                    Spacer()
-                                    Text(DevMaidFormatters.byteString(entry.totalBytes))
-                                        .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                        .foregroundStyle(DevMaidPalette.muted)
-                                }
-                                Text(entry.summary)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundStyle(DevMaidPalette.ink)
-                                    .lineLimit(2)
-                                HStack {
-                                    Text(DevMaidFormatters.dateTimeString(entry.createdAt))
-                                        .font(.system(size: 11))
-                                        .foregroundStyle(DevMaidPalette.muted)
-                                    Spacer()
-                                    Text("\(entry.itemCount)")
-                                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                                        .foregroundStyle(DevMaidPalette.muted)
-                                }
-                            }
-                            .padding(.vertical, 8)
-                            .tag(Optional(entry.id))
+                            Text(copy.historyTitle)
+                                .font(.system(size: 30, weight: .bold, design: .rounded))
+                                .foregroundStyle(DevMaidPalette.ink)
+
+                            Text(copy.historyHeroDetail)
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(DevMaidPalette.muted)
+                                .frame(maxWidth: 660, alignment: .leading)
+                        }
+
+                        Spacer()
+
+                        VStack(alignment: .leading, spacing: 10) {
+                            InfoChip(title: copy.historyTitle, value: "\(model.historyEntries.count)", symbolName: "clock.arrow.circlepath")
+                            InfoChip(title: copy.itemsMetricTitle, value: "\(model.selectedHistoryEntry?.itemCount ?? 0)", symbolName: "shippingbox.fill")
+                            InfoChip(title: copy.bytesMetricTitle, value: DevMaidFormatters.byteString(model.selectedHistoryEntry?.totalBytes ?? 0), symbolName: "internaldrive.fill")
                         }
                     }
-                    .scrollContentBackground(.hidden)
                 }
-            }
-            .frame(minWidth: 320)
 
-            VStack(alignment: .leading, spacing: 16) {
-                Group {
-                    if let entry = model.selectedHistoryEntry {
-                        SurfaceCard {
-                            HStack(alignment: .top) {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    ActionKindBadge(kind: entry.kind, language: model.language)
-                                    Text(entry.kind.localizedDisplayName(in: model.language))
-                                        .font(.system(size: 24, weight: .bold, design: .rounded))
-                                    Text(entry.summary)
-                                        .font(.system(size: 14))
-                                        .foregroundStyle(DevMaidPalette.muted)
-                                }
-                                Spacer(minLength: 24)
-                                VStack(alignment: .trailing, spacing: 10) {
-                                    if entry.kind == .delete {
-                                        Button(copy.restoreAction) {
-                                            model.restoreSelectedHistory()
+                HStack(spacing: 18) {
+                    SurfaceCard(padding: 0) {
+                        VStack(alignment: .leading, spacing: 0) {
+                            SectionTitleRow(
+                                title: copy.historyTimelineTitle,
+                                detail: copy.historyTimelineDetail
+                            )
+                            .padding(18)
+
+                            List(selection: Binding(
+                                get: { model.selectedHistoryID },
+                                set: { model.selectHistory(id: $0) }
+                            )) {
+                                ForEach(model.historyEntries) { entry in
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        HStack(alignment: .top) {
+                                            ActionKindBadge(kind: entry.kind, language: model.language)
+                                            Spacer()
+                                            Text(DevMaidFormatters.byteString(entry.totalBytes))
+                                                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                                .foregroundStyle(DevMaidPalette.muted)
                                         }
-                                        .buttonStyle(.borderedProminent)
-                                        .disabled(!model.canRestoreSelectedHistory)
+                                        Text(entry.summary)
+                                            .font(.system(size: 13, weight: .semibold))
+                                            .foregroundStyle(DevMaidPalette.ink)
+                                            .lineLimit(2)
+                                        HStack {
+                                            Text(DevMaidFormatters.dateTimeString(entry.createdAt))
+                                                .font(.system(size: 11))
+                                                .foregroundStyle(DevMaidPalette.muted)
+                                            Spacer()
+                                            Text("\(entry.itemCount)")
+                                                .font(.system(size: 11, weight: .bold, design: .rounded))
+                                                .foregroundStyle(DevMaidPalette.muted)
+                                        }
                                     }
-                                    Button(copy.exportHistoryAction) {
-                                        model.exportHistory()
-                                    }
-                                    .buttonStyle(.bordered)
+                                    .padding(.vertical, 8)
+                                    .tag(Optional(entry.id))
                                 }
                             }
+                            .scrollContentBackground(.hidden)
                         }
+                    }
+                    .frame(minWidth: 320)
 
-                        HStack(spacing: 16) {
-                            MetricCard(
-                                title: copy.itemsMetricTitle,
-                                value: "\(entry.itemCount)",
-                                detail: copy.itemsMetricDetail,
-                                symbolName: "shippingbox.fill"
-                            )
-                            MetricCard(
-                                title: copy.bytesMetricTitle,
-                                value: DevMaidFormatters.byteString(entry.totalBytes),
-                                detail: copy.bytesMetricDetail,
-                                symbolName: "internaldrive.fill"
-                            )
-                        }
+                    VStack(alignment: .leading, spacing: 16) {
+                        Group {
+                            if let entry = model.selectedHistoryEntry {
+                                SurfaceCard {
+                                    HStack(alignment: .top) {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            ActionKindBadge(kind: entry.kind, language: model.language)
+                                            Text(entry.kind.localizedDisplayName(in: model.language))
+                                                .font(.system(size: 24, weight: .bold, design: .rounded))
+                                            Text(entry.summary)
+                                                .font(.system(size: 14))
+                                                .foregroundStyle(DevMaidPalette.muted)
+                                        }
+                                        Spacer(minLength: 24)
+                                        VStack(alignment: .trailing, spacing: 10) {
+                                            if entry.kind == .delete {
+                                                Button(copy.restoreAction) {
+                                                    model.restoreSelectedHistory()
+                                                }
+                                                .buttonStyle(.borderedProminent)
+                                                .disabled(!model.canRestoreSelectedHistory)
+                                            }
+                                            Button(copy.exportHistoryAction) {
+                                                model.exportHistory()
+                                            }
+                                            .buttonStyle(.bordered)
+                                        }
+                                    }
+                                }
 
-                        if let manifest = model.selectedHistoryManifest {
-                            SurfaceCard {
-                                VStack(alignment: .leading, spacing: 12) {
-                                    SectionTitleRow(
-                                        title: copy.manifestItemsTitle,
-                                        detail: copy.manifestItemsDetail
+                                HStack(spacing: 16) {
+                                    MetricCard(
+                                        title: copy.itemsMetricTitle,
+                                        value: "\(entry.itemCount)",
+                                        detail: copy.itemsMetricDetail,
+                                        symbolName: "shippingbox.fill"
                                     )
-                                    ScrollView {
-                                        LazyVStack(alignment: .leading, spacing: 10) {
-                                            ForEach(manifest.items) { item in
-                                                DetailSectionCard(
-                                                    title: item.category.localizedDisplayName(in: model.language),
-                                                    detail: item.note
-                                                ) {
-                                                    VStack(alignment: .leading, spacing: 10) {
-                                                        HStack {
-                                                            RiskBadge(risk: item.risk, language: model.language)
-                                                            Spacer()
-                                                            Text(DevMaidFormatters.byteString(item.bytes))
-                                                                .font(.system(size: 12, weight: .bold, design: .monospaced))
-                                                                .foregroundStyle(DevMaidPalette.muted)
+                                    MetricCard(
+                                        title: copy.bytesMetricTitle,
+                                        value: DevMaidFormatters.byteString(entry.totalBytes),
+                                        detail: copy.bytesMetricDetail,
+                                        symbolName: "internaldrive.fill"
+                                    )
+                                }
+
+                                if let manifest = model.selectedHistoryManifest {
+                                    SurfaceCard {
+                                        VStack(alignment: .leading, spacing: 12) {
+                                            SectionTitleRow(
+                                                title: copy.manifestItemsTitle,
+                                                detail: copy.manifestItemsDetail
+                                            )
+                                            ScrollView {
+                                                LazyVStack(alignment: .leading, spacing: 10) {
+                                                    ForEach(manifest.items) { item in
+                                                        DetailSectionCard(
+                                                            title: item.category.localizedDisplayName(in: model.language),
+                                                            detail: item.note
+                                                        ) {
+                                                            VStack(alignment: .leading, spacing: 10) {
+                                                                HStack {
+                                                                    RiskBadge(risk: item.risk, language: model.language)
+                                                                    Spacer()
+                                                                    Text(DevMaidFormatters.byteString(item.bytes))
+                                                                        .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                                                        .foregroundStyle(DevMaidPalette.muted)
+                                                                }
+                                                                Text(item.originalPath)
+                                                                    .font(.system(size: 12))
+                                                                    .foregroundStyle(DevMaidPalette.ink)
+                                                                    .textSelection(.enabled)
+                                                                    .lineLimit(2)
+                                                                    .truncationMode(.middle)
+                                                            }
                                                         }
-                                                        Text(item.originalPath)
-                                                            .font(.system(size: 12))
-                                                            .foregroundStyle(DevMaidPalette.ink)
-                                                            .textSelection(.enabled)
-                                                            .lineLimit(2)
-                                                            .truncationMode(.middle)
                                                     }
                                                 }
                                             }
+                                            .frame(maxHeight: .infinity)
                                         }
                                     }
-                                    .frame(maxHeight: .infinity)
-                                }
-                            }
-                        } else {
-                            SurfaceCard {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(copy.noManifestPreview)
-                                        .font(.system(size: 12))
-                                        .foregroundStyle(DevMaidPalette.muted)
-                                    if let sourceActionID = entry.sourceActionID {
-                                        Text("\(copy.sourceActionPrefix) \(sourceActionID)")
-                                            .font(.system(size: 12))
-                                            .foregroundStyle(DevMaidPalette.muted)
+                                } else {
+                                    SurfaceCard {
+                                        VStack(alignment: .leading, spacing: 8) {
+                                            Text(copy.noManifestPreview)
+                                                .font(.system(size: 12))
+                                                .foregroundStyle(DevMaidPalette.muted)
+                                            if let sourceActionID = entry.sourceActionID {
+                                                Text("\(copy.sourceActionPrefix) \(sourceActionID)")
+                                                    .font(.system(size: 12))
+                                                    .foregroundStyle(DevMaidPalette.muted)
+                                            }
+                                        }
                                     }
                                 }
+                            } else {
+                                SurfaceCard {
+                                    Text(copy.historyEmpty)
+                                        .font(.system(size: 14))
+                                        .foregroundStyle(DevMaidPalette.muted)
+                                }
                             }
                         }
+                        .id(historyDetailID)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: .trailing).combined(with: .opacity),
+                            removal: .opacity
+                        ))
                     }
-                    else {
-                        SurfaceCard {
-                            Text(copy.historyEmpty)
-                                .font(.system(size: 14))
-                                .foregroundStyle(DevMaidPalette.muted)
-                        }
-                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
                 }
-                .id(historyDetailID)
-                .transition(.asymmetric(
-                    insertion: .move(edge: .trailing).combined(with: .opacity),
-                    removal: .opacity
-                ))
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+            .padding(10)
         }
         .animation(.spring(response: 0.34, dampingFraction: 0.84), value: model.selectedHistoryID)
     }

@@ -32,5 +32,16 @@ jobs:
       - name: Build desktop app
         run: swift build --product DevMaidApp
 
+      - name: Run unit tests
+        run: swift test --filter DevMaidKitTests
+
       - name: Run smoke test
         run: ./scripts/smoke_test.sh
+
+      - name: SwiftLint
+        run: |
+          if command -v swiftlint >/dev/null; then
+            swiftlint lint --strict
+          else
+            echo "SwiftLint not found, skipping."
+          fi

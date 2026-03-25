@@ -287,8 +287,20 @@ final class DevMaidAppModel: ObservableObject {
     @Published var selectedHistoryID: String?
     @Published var selectedHistoryManifest: DeleteManifest?
     @Published var lastRestoreSkipped: [String] = []
-    @Published var lastActionMessage: String?
-    @Published var lastError: String?
+    @Published var lastActionMessage: String? {
+        didSet {
+            if lastActionMessage != nil {
+                scheduleDismissal(for: \.lastActionMessage)
+            }
+        }
+    }
+    @Published var lastError: String? {
+        didSet {
+            if lastError != nil {
+                scheduleDismissal(for: \.lastError)
+            }
+        }
+    }
     @Published var showCleanupConfirmation = false
     @Published var showDangerConfirmation = false
     @Published var requireConfirmation: Bool
@@ -315,6 +327,17 @@ final class DevMaidAppModel: ObservableObject {
     private let scanHistoryStore = ScanHistoryStore()
     private var hasPerformedLaunchTasks = false
 
+    private func scheduleDismissal(for keyPath: ReferenceWritableKeyPath<DevMaidAppModel, String?>) {
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: 5_000_000_000)
+            if self[keyPath: keyPath] != nil {
+                withAnimation {
+                    self[keyPath: keyPath] = nil
+                }
+            }
+        }
+    }
+
     private var launchDestinationOverride: DevMaidDestination? {
         let env = ProcessInfo.processInfo.environment
         if let rawValue = env["DEVMAID_LAUNCH_DESTINATION"] ?? env["ROOMSERVICE_LAUNCH_DESTINATION"] {
@@ -330,7 +353,7 @@ final class DevMaidAppModel: ObservableObject {
 
     private var testScanDelayNanoseconds: UInt64 {
         let env = ProcessInfo.processInfo.environment
-        guard let rawValue = env["DEVMAID_TEST_SCAN_DELAY_MS"] ?? env["DEVMAID_TEST_SCAN_DELAY_MS"],
+        guard let rawValue = env["DEVMAID_TEST_SCAN_DELAY_MS"] ?? env["ROOMSERVICE_TEST_SCAN_DELAY_MS"],
               let milliseconds = UInt64(rawValue) else {
             return 0
         }

@@ -41,5 +41,9 @@ let package = Package(
                 .unsafeFlags(["-parse-as-library"]),
             ]
         ),
+        .testTarget(
+            name: "DevMaidKitTests",
+            dependencies: ["DevMaidKit"]
+        ),
     ]
 )
