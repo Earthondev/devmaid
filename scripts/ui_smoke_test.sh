@@ -172,6 +172,21 @@ open -na "$APP_BUNDLE"
 sleep 2
 APP_PID="$(pgrep -f "$APP_BIN" | tail -n 1)"
 
+run_osascript <<'APPLESCRIPT'
+try
+  tell application "DevMaid" to activate
+  delay 1
+  tell application "System Events"
+    tell process "DevMaid"
+      if exists (sheet 1 of window 1) then
+        click button "Start using DevMaid" of sheet 1 of window 1
+        delay 1
+      end if
+    end tell
+  end tell
+end try
+APPLESCRIPT
+
 toolbar_language="$(detect_toolbar_language)"
 if [[ "$toolbar_language" == "th" ]]; then
   run_scan_label="เริ่มสแกน"

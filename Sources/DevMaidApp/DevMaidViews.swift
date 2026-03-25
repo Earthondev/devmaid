@@ -58,6 +58,7 @@ struct DevMaidRootView: View {
                     Button(copy.toolbarCancelScan, role: .cancel) {
                         model.cancelScan()
                     }
+                    .help(copy.toolbarCancelScan)
                 } else if let operation = model.currentOperation {
                     ProgressView(copy.progressTitle(for: operation))
                         .controlSize(.small)
@@ -67,6 +68,7 @@ struct DevMaidRootView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .disabled(!model.canScan)
+                    .help(copy.toolbarRunScan)
                 }
 
                 if model.destination == .results {
@@ -74,6 +76,7 @@ struct DevMaidRootView: View {
                         model.requestCleanup()
                     }
                     .disabled(!model.canCleanupSelection)
+                    .help(copy.toolbarQuarantineSelected)
                 }
             }
         }
