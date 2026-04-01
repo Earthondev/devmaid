@@ -5,7 +5,7 @@ struct DevMaidRootView: View {
     @EnvironmentObject private var model: DevMaidAppModel
 
     private var copy: DevMaidCopy { model.copy }
-    private let sidebarTopInset: CGFloat = 56
+    private let sidebarTopInset: CGFloat = 64
     private let contentTopInset: CGFloat = 10
 
     var body: some View {
@@ -96,10 +96,10 @@ struct DevMaidRootView: View {
         VStack(spacing: 0) {
             HStack(spacing: 12) {
                 DevMaidMark()
-                    .frame(width: 28, height: 28)
+                    .frame(width: 26, height: 26)
 
                 Text(copy.appName)
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(.white)
             }
             .padding(.horizontal, 24)
@@ -1649,10 +1649,16 @@ struct OnboardingSheet: View {
 
 struct AboutScreen: View {
     @EnvironmentObject private var model: DevMaidAppModel
+    private let linkGrid = [
+        GridItem(.adaptive(minimum: 180), spacing: 12),
+    ]
 
     private var appVersion: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "0.1.0"
         let build = Bundle.main.object(forInfoDictionaryKey: "CFBundleVersion") as? String ?? version
+        if build.isEmpty || build == version {
+            return version
+        }
         return "\(version) (\(build))"
     }
 
@@ -1722,13 +1728,12 @@ struct AboutScreen: View {
                     VStack(alignment: .leading, spacing: 12) {
                         Text(copy.linksTitle)
                             .font(.system(size: 18, weight: .bold))
-                        HStack(spacing: 12) {
-                            Link(copy.website, destination: DevMaidLinks.website)
-                            Link(copy.repository, destination: DevMaidLinks.repository)
-                            Link(copy.support, destination: DevMaidLinks.support)
-                            Link(copy.sponsor, destination: DevMaidLinks.sponsor)
+                        LazyVGrid(columns: linkGrid, spacing: 12) {
+                            AboutLinkTile(title: copy.website, destination: DevMaidLinks.website, systemImage: "globe")
+                            AboutLinkTile(title: copy.repository, destination: DevMaidLinks.repository, systemImage: "square.stack.3d.up")
+                            AboutLinkTile(title: copy.support, destination: DevMaidLinks.support, systemImage: "bubble.left.and.exclamationmark.bubble.right")
+                            AboutLinkTile(title: copy.sponsor, destination: DevMaidLinks.sponsor, systemImage: "heart.fill")
                         }
-                        .font(.system(size: 13, weight: .semibold))
                     }
                 }
 
@@ -1773,6 +1778,22 @@ struct UpdateStatusCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 18) {
+                    primaryColumn
+                    secondaryColumn
+                        .frame(maxWidth: 340, alignment: .leading)
+                }
+                VStack(alignment: .leading, spacing: 18) {
+                    primaryColumn
+                    secondaryColumn
+                }
+            }
+        }
+    }
+
+    private var primaryColumn: some View {
+        VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 6) {
                     UpdateBadge(title: copy.updateBadgeTitle(for: model.updateState), tint: tint)
@@ -1788,38 +1809,9 @@ struct UpdateStatusCard: View {
                 }
             }
 
-            HStack(spacing: 12) {
-                InfoChip(title: copy.currentVersionLabel, value: model.currentAppVersion, symbolName: "macwindow.on.rectangle")
-
-                if let latestVersion = model.latestKnownVersion {
-                    InfoChip(title: copy.latestVersionLabel, value: latestVersion, symbolName: "sparkles")
-                }
-            }
-
             if let summary = model.updateSummary, !summary.isEmpty {
                 Text(summary)
                     .font(.system(size: 13))
-                    .foregroundStyle(DevMaidPalette.muted)
-            }
-
-            VStack(alignment: .leading, spacing: 8) {
-                if let checkedAt = model.lastUpdateCheckDate {
-                    metadataRow(title: copy.lastCheckedLabel, value: DevMaidFormatters.dateTimeString(checkedAt))
-                }
-
-                if let feedURL = model.updateFeedURL {
-                    metadataRow(title: copy.updateFeedLabel, value: feedURL.absoluteString)
-                }
-            }
-
-            if showAutoCheckToggle {
-                Toggle(copy.autoCheckUpdates, isOn: Binding(
-                    get: { model.automaticallyCheckForUpdates },
-                    set: { model.setAutomaticUpdateChecks($0) }
-                ))
-
-                Text(copy.autoCheckUpdatesDetail)
-                    .font(.system(size: 12))
                     .foregroundStyle(DevMaidPalette.muted)
             }
 
@@ -1847,6 +1839,48 @@ struct UpdateStatusCard: View {
         }
     }
 
+    private var secondaryColumn: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 12) {
+                InfoChip(title: copy.currentVersionLabel, value: model.currentAppVersion, symbolName: "macwindow.on.rectangle")
+
+                if let latestVersion = model.latestKnownVersion {
+                    InfoChip(title: copy.latestVersionLabel, value: latestVersion, symbolName: "sparkles")
+                }
+            }
+
+            VStack(alignment: .leading, spacing: 10) {
+                if let checkedAt = model.lastUpdateCheckDate {
+                    metadataRow(title: copy.lastCheckedLabel, value: DevMaidFormatters.dateTimeString(checkedAt))
+                }
+
+                if let feedURL = model.updateFeedURL {
+                    metadataRow(title: copy.updateFeedLabel, value: feedURL.absoluteString)
+                }
+            }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(DevMaidPalette.cardStrong.opacity(0.36))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .stroke(DevMaidPalette.border, lineWidth: 1)
+                    )
+            )
+
+            if showAutoCheckToggle {
+                Toggle(copy.autoCheckUpdates, isOn: Binding(
+                    get: { model.automaticallyCheckForUpdates },
+                    set: { model.setAutomaticUpdateChecks($0) }
+                ))
+
+                Text(copy.autoCheckUpdatesDetail)
+                    .font(.system(size: 12))
+                    .foregroundStyle(DevMaidPalette.muted)
+            }
+        }
+    }
+
     private func metadataRow(title: String, value: String) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(title)
@@ -1859,6 +1893,51 @@ struct UpdateStatusCard: View {
                 .lineLimit(2)
                 .truncationMode(.middle)
         }
+    }
+}
+
+private struct AboutLinkTile: View {
+    let title: String
+    let destination: URL
+    let systemImage: String
+
+    var body: some View {
+        Link(destination: destination) {
+            HStack(spacing: 12) {
+                Image(systemName: systemImage)
+                    .font(.system(size: 14, weight: .bold))
+                    .frame(width: 32, height: 32)
+                    .background(DevMaidPalette.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 11, style: .continuous))
+                    .foregroundStyle(DevMaidPalette.accent)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(DevMaidPalette.ink)
+                    Text(destination.host ?? destination.absoluteString)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(DevMaidPalette.muted)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 8)
+
+                Image(systemName: "arrow.up.right")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundStyle(DevMaidPalette.muted)
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(.thinMaterial)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
+                            .stroke(DevMaidPalette.border, lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 

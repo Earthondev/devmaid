@@ -7,6 +7,7 @@ APP_BUNDLE="$ROOT_DIR/dist/DevMaid.app"
 APP_BIN="$APP_BUNDLE/Contents/MacOS/DevMaid"
 OUTPUT_DIR="${1:-$HOME/Desktop}"
 TMP_DIR="$(mktemp -d /tmp/devmaid-captures.XXXXXX)"
+MOCK_UPDATE_VERSION="0.3.0"
 APP_PID=""
 
 cleanup() {
@@ -19,6 +20,8 @@ cleanup() {
   launchctl unsetenv DEVMAID_LANGUAGE 2>/dev/null || true
   launchctl unsetenv DEVMAID_VOLATILE_PREFERENCES 2>/dev/null || true
   launchctl unsetenv DEVMAID_UPDATE_FEED_URL 2>/dev/null || true
+  launchctl unsetenv DEVMAID_LAUNCH_DESTINATION 2>/dev/null || true
+  launchctl unsetenv DEVMAID_AUTO_RUN_SCAN_ON_LAUNCH 2>/dev/null || true
   pkill -f "$APP_BIN" 2>/dev/null || true
   rm -rf "$TMP_DIR"
 }
@@ -58,15 +61,17 @@ PY
 
 cat > "$UPDATE_FEED" <<'JSON'
 {
-  "version": "0.3.0",
-  "build": "0.3.0",
+  "version": "__MOCK_UPDATE_VERSION__",
+  "build": "__MOCK_UPDATE_VERSION__",
   "minimumSystemVersion": "13.0",
   "summary": "A softer glassmorphism refresh, in-app update checks, and a cleaner macOS-native navigation shell.",
-  "downloadURL": "https://github.com/Earthondev/devmaid/releases/download/v0.3.0/DevMaid-0.3.0.dmg",
-  "releaseNotesURL": "https://github.com/Earthondev/devmaid/releases/tag/v0.3.0",
+  "downloadURL": "https://github.com/Earthondev/devmaid/releases/download/v__MOCK_UPDATE_VERSION__/DevMaid-__MOCK_UPDATE_VERSION__.dmg",
+  "releaseNotesURL": "https://github.com/Earthondev/devmaid/releases/tag/v__MOCK_UPDATE_VERSION__",
   "publishedAt": "2026-03-24T12:00:00Z"
 }
 JSON
+
+perl -0pi -e 's/__MOCK_UPDATE_VERSION__/'"$MOCK_UPDATE_VERSION"'/g' "$UPDATE_FEED"
 
 env \
   DEVMAID_HOME="$APP_HOME" \
@@ -85,13 +90,6 @@ path = Path(sys.argv[1])
 path.parent.mkdir(parents=True, exist_ok=True)
 path.write_bytes(("module.exports = 'next';\n" * 2200).encode())
 PY
-
-launchctl setenv DEVMAID_HOME "$APP_HOME"
-launchctl setenv DEVMAID_SEARCH_ROOTS "$WORKSPACE"
-launchctl setenv DEVMAID_LANGUAGE "en"
-launchctl setenv DEVMAID_VOLATILE_PREFERENCES "1"
-launchctl setenv DEVMAID_UPDATE_FEED_URL "$UPDATE_FEED"
-open -na "$APP_BUNDLE"
 
 run_osascript() {
   osascript "$@"
@@ -296,6 +294,7 @@ import Foundation
 
 let targetTitle = CommandLine.arguments[1]
 let infos = CGWindowListCopyWindowInfo([.optionOnScreenOnly], kCGNullWindowID) as? [[String: Any]] ?? []
+var fallbackWindowNumber: Any?
 
 for info in infos {
     let ownerName = info[kCGWindowOwnerName as String] as? String ?? ""
@@ -306,12 +305,20 @@ for info in infos {
         continue
     }
 
+    if fallbackWindowNumber == nil {
+        fallbackWindowNumber = info[kCGWindowNumber as String]
+    }
+
     if title == targetTitle {
         if let number = info[kCGWindowNumber as String] {
             print(number)
             break
         }
     }
+}
+
+if let fallbackWindowNumber {
+    print(fallbackWindowNumber)
 }
 ' "$title"
 }
@@ -338,7 +345,43 @@ capture_window() {
     return 1
   fi
 
-  screencapture -x -l "$window_id" "$output_path"
+  for _ in $(seq 1 8); do
+    window_id="$(window_id_for_title "$title" | tr -d '\n')"
+    if [[ -n "$window_id" ]] && swift -e '
+import CoreGraphics
+import Foundation
+import ImageIO
+import UniformTypeIdentifiers
+
+let windowID = CGWindowID(UInt32(CommandLine.arguments[1]) ?? 0)
+let outputURL = URL(fileURLWithPath: CommandLine.arguments[2]) as CFURL
+
+guard let image = CGWindowListCreateImage(.null, .optionIncludingWindow, windowID, [.boundsIgnoreFraming, .bestResolution]) else {
+    fputs("could not create image from window\n", stderr)
+    exit(1)
+}
+
+guard let destination = CGImageDestinationCreateWithURL(outputURL, UTType.png.identifier as CFString, 1, nil) else {
+    fputs("could not create image destination\n", stderr)
+    exit(1)
+}
+
+CGImageDestinationAddImage(destination, image, nil)
+
+guard CGImageDestinationFinalize(destination) else {
+    fputs("could not finalize image destination\n", stderr)
+    exit(1)
+}
+' "$window_id" "$output_path" >/dev/null 2>&1; then
+      return 0
+    fi
+    activate_app >/dev/null 2>&1 || true
+    focus_main_window >/dev/null 2>&1 || true
+    sleep 1
+  done
+
+  echo "Unable to capture a DevMaid window titled '$title'." >&2
+  return 1
 }
 
 launch_for_capture() {
